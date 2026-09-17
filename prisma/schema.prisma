@@ -1,0 +1,289 @@
+// ============================================================================
+// ZeloPets — schema.prisma
+// Cobre os 3 produtos (Mobilidade, Hotel, Nutrição) + os campos de perfil do
+// pet que alimentam o microsserviço de K-Means (o "gêmeo digital do pet").
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------------------------
+
+enum Especie {
+  CACHORRO
+  GATO
+}
+
+enum Porte {
+  PEQUENO
+  MEDIO
+  GRANDE
+}
+
+enum NivelEnergia {
+  BAIXO
+  MEDIO
+  ALTO
+}
+
+enum TipoPrestador {
+  PASSEADOR
+  HOTEL
+}
+
+enum StatusAgendamento {
+  PENDENTE
+  CONFIRMADO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum StatusAssinatura {
+  ATIVA
+  PAUSADA
+  CANCELADA
+}
+
+enum StatusPagamento {
+  PENDENTE
+  APROVADO
+  RECUSADO
+  CANCELADO
+}
+
+enum NivelConvivencia {
+  INDIVIDUAL
+  GRUPO_PEQUENO
+  GRUPO_GRANDE
+}
+
+enum NivelContato {
+  BAIXO
+  MEDIO
+  ALTO
+}
+
+enum TipoServicoAvaliado {
+  PASSEIO
+  HOSPEDAGEM
+  NUTRICAO
+}
+
+// ---------------------------------------------------------------------------
+// USUÁRIOS
+// ---------------------------------------------------------------------------
+
+model Tutor {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senhaHash String
+  telefone  String?
+  criadoEm  DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  pets                     Pet[]
+  passeios                 Passeio[]
+  hospedagens              Hospedagem[]
+  assinaturasNutricionais  AssinaturaNutricional[]
+  avaliacoes               Avaliacao[]
+}
+
+// ---------------------------------------------------------------------------
+// PET — o "gêmeo digital". Estes campos são exatamente o vetor de
+// características usado no pipeline de K-Means (padronizados via
+// StandardScaler no microsserviço Python).
+// ---------------------------------------------------------------------------
+
+model Pet {
+  id        String   @id @default(uuid())
+  tutorId   String
+  tutor     Tutor    @relation(fields: [tutorId], references: [id])
+
+  nome            String
+  especie         Especie
+  raca            String?
+  dataNascimento  DateTime?
+  porte           Porte
+  pesoKg          Float?
+  nivelEnergia    NivelEnergia
+
+  // usados como features de clustering
+  restricoesAlimentares String[] // ex: ["sem gluten", "alergia a frango"]
+  comportamento          String[] // tags livres: ["ansioso", "sociavel", "medroso"]
+
+  fotoUrl   String?
+  criadoEm  DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  passeios                Passeio[]
+  hospedagens             Hospedagem[]
+  assinaturasNutricionais AssinaturaNutricional[]
+  perfilCluster           PerfilPetCluster?
+
+  @@index([tutorId])
+}
+
+// ---------------------------------------------------------------------------
+// PRESTADORES (passeadores e hotéis)
+// ---------------------------------------------------------------------------
+
+model Prestador {
+  id              String        @id @default(uuid())
+  nome            String
+  tipo            TipoPrestador
+  bio             String?
+  experienciaAnos Int           @default(0)
+  avaliacaoMedia  Float         @default(0)
+  fotoUrl         String?
+  ativo           Boolean       @default(true)
+  criadoEm        DateTime      @default(now())
+
+  passeios    Passeio[]
+  hospedagens Hospedagem[]
+  avaliacoes  Avaliacao[]
+
+  @@index([tipo])
+}
+
+// ---------------------------------------------------------------------------
+// PRODUTO 1 — MOBILIDADE
+// ---------------------------------------------------------------------------
+
+model Passeio {
+  id             String            @id @default(uuid())
+  tutorId        String
+  tutor          Tutor             @relation(fields: [tutorId], references: [id])
+  petId          String
+  pet            Pet               @relation(fields: [petId], references: [id])
+  prestadorId    String?
+  prestador      Prestador?        @relation(fields: [prestadorId], references: [id])
+
+  dataHora        DateTime
+  duracaoMinutos  Int               @default(30)
+  status          StatusAgendamento @default(PENDENTE)
+  statusPagamento StatusPagamento   @default(PENDENTE)
+  valor           Decimal           @db.Decimal(10, 2)
+  criadoEm        DateTime          @default(now())
+
+  @@index([petId])
+  @@index([tutorId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// PRODUTO 2 — HOTEL ZELOPETS
+// ---------------------------------------------------------------------------
+
+model PacoteHospedagem {
+  id               String           @id @default(uuid())
+  nome             String           // Essencial, Conforto, Premium
+  descricao        String?
+  precoDiaria      Decimal          @db.Decimal(10, 2)
+  nivelConvivencia NivelConvivencia
+  nivelContato     NivelContato
+
+  hospedagens Hospedagem[]
+}
+
+model Hospedagem {
+  id          String            @id @default(uuid())
+  tutorId     String
+  tutor       Tutor             @relation(fields: [tutorId], references: [id])
+  petId       String
+  pet         Pet               @relation(fields: [petId], references: [id])
+  prestadorId String?
+  prestador   Prestador?        @relation(fields: [prestadorId], references: [id])
+  pacoteId    String
+  pacote      PacoteHospedagem  @relation(fields: [pacoteId], references: [id])
+
+  dataCheckin     DateTime
+  dataCheckout    DateTime
+  status          StatusAgendamento @default(PENDENTE)
+  statusPagamento StatusPagamento   @default(PENDENTE)
+  valorTotal      Decimal           @db.Decimal(10, 2)
+  criadoEm        DateTime          @default(now())
+
+  @@index([petId])
+  @@index([tutorId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// PRODUTO 3 — NUTRIÇÃO POR ASSINATURA
+// ---------------------------------------------------------------------------
+
+model PlanoNutricional {
+  id          String   @id @default(uuid())
+  nome        String
+  descricao   String?
+  precoMensal Decimal  @db.Decimal(10, 2)
+  tipoDieta   String?  // ex: "natural", "premium", "hipoalergenica"
+
+  assinaturas AssinaturaNutricional[]
+}
+
+model AssinaturaNutricional {
+  id      String            @id @default(uuid())
+  tutorId String
+  tutor   Tutor             @relation(fields: [tutorId], references: [id])
+  petId   String
+  pet     Pet               @relation(fields: [petId], references: [id])
+  planoId String
+  plano   PlanoNutricional  @relation(fields: [planoId], references: [id])
+
+  dataInicio             DateTime @default(now())
+  status                 StatusAssinatura @default(ATIVA)
+  quantidadeRacaoKg      Float
+  consumoDiarioEstimadoG Float
+  previsaoProximaEntrega DateTime?
+  statusPagamento        StatusPagamento @default(PENDENTE)
+  criadoEm               DateTime @default(now())
+
+  @@index([petId])
+  @@index([tutorId])
+}
+
+// ---------------------------------------------------------------------------
+// AVALIAÇÕES (alimentam a nota média do prestador)
+// ---------------------------------------------------------------------------
+
+model Avaliacao {
+  id          String              @id @default(uuid())
+  tutorId     String
+  tutor       Tutor               @relation(fields: [tutorId], references: [id])
+  prestadorId String
+  prestador   Prestador           @relation(fields: [prestadorId], references: [id])
+
+  tipoServico TipoServicoAvaliado
+  nota        Int                 // 1 a 5
+  comentario  String?
+  criadoEm    DateTime            @default(now())
+
+  @@index([prestadorId])
+}
+
+// ---------------------------------------------------------------------------
+// RESULTADO DO K-MEANS — cache do que o microsserviço Python calculou por pet.
+// O microsserviço lê os dados do Pet (via API ou export), roda o clustering
+// e grava aqui o cluster e as recomendações para os 3 produtos.
+// ---------------------------------------------------------------------------
+
+model PerfilPetCluster {
+  id      String @id @default(uuid())
+  petId   String @unique
+  pet     Pet    @relation(fields: [petId], references: [id])
+
+  clusterId        Int
+  featuresSnapshot Json     // vetor padronizado (StandardScaler) usado no cálculo
+  recomendacoes    Json     // { passeadorRecomendadoId, pacoteHospedagemRecomendadoId, planoNutricionalRecomendadoId }
+  atualizadoEm     DateTime @updatedAt
+}
