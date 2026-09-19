@@ -1,0 +1,44 @@
+:root {
+  /* Fraunces nos títulos: serifa quente e editorial, reforça o tom
+     "aconchego" da marca sem parecer infantil.
+     Figtree no corpo: sans humanista com cantos suaves, legível em
+     telas pequenas, sem cair no genérico do Inter/Arial. */
+  --fonte-display: 'Fraunces', serif;
+  --fonte-corpo: 'Figtree', sans-serif;
+
+  --tamanho-corpo-sm: 0.875rem;   /* 14px — legendas, notas */
+  --tamanho-corpo: 1rem;          /* 16px — texto padrão */
+  --tamanho-corpo-lg: 1.125rem;   /* 18px — texto de destaque no corpo */
+  --tamanho-titulo-sm: 1.5rem;    /* 24px — títulos de seção */
+  --tamanho-titulo: 2rem;         /* 32px — título principal da tela */
+  --tamanho-titulo-lg: 2.75rem;   /* 44px — reservado pro momento de maior impacto (ex: saudação) */
+}
+
+body {
+  font-family: var(--fonte-corpo);
+  font-size: var(--tamanho-corpo);
+  line-height: 1.5;
+}
+
+h1 {
+  font-family: var(--fonte-display);
+  font-size: var(--tamanho-titulo-lg);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+h2 {
+  font-family: var(--fonte-display);
+  font-size: var(--tamanho-titulo);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.tipografia-legenda {
+  font-size: var(--tamanho-corpo-sm);
+}
+
+.tipografia-destaque {
+  font-size: var(--tamanho-corpo-lg);
+  font-weight: 600;
+}
