@@ -1,0 +1,70 @@
+:root {
+  /* Base — canvas claro e acolhedor (a marca pede "nada de tons
+     escuros ou pesados"; as 3 cores da marca entram como estrutura
+     e acento sobre essa base, não como fundo cheio) */
+  --cor-fundo: #FFFBF5;
+  --cor-texto: #1F2A24;
+  --cor-texto-sobre-dominante: #FFFBF5;
+
+  /* Dominante — Verde ZeloPets. Usado nas superfícies estruturais:
+     cabeçalho da saudação, fundo das portas de cuidado, navegação. */
+  --cor-dominante: #2F7A5C;
+  --cor-dominante-escura: #27644B; /* hover/pressed */
+
+  /* Acento marcado — Âmbar Caramelo. Reservado só pra ação mais
+     importante da tela: CTA de criar o gêmeo digital, acesso ao
+     Zelinho, a porta de cuidado em destaque. Se tudo usar essa cor,
+     ela para de significar "isso aqui importa mais". */
+  --cor-acento: #E0A24B;
+  --cor-acento-escura: #D18924; /* hover/pressed */
+
+  /* Respiro pontual — Verde-menta. Só pra elementos informativos,
+     não-clicáveis (ex: a faixa de status do próximo agendamento). */
+  --cor-respiro: #A8E6C8;
+  --cor-respiro-escura: #70D6A5;
+}
+
+body {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+}
+
+/* Superfícies estruturais (dominante) */
+.saudacao-do-zelo,
+.porta-de-cuidado {
+  background-color: var(--cor-dominante);
+  color: var(--cor-texto-sobre-dominante);
+  border-radius: 1.25rem; /* raio generoso — é clicável/estrutural */
+}
+
+.porta-de-cuidado--destaque {
+  background-color: var(--cor-acento);
+}
+
+.porta-de-cuidado:hover {
+  background-color: var(--cor-dominante-escura);
+}
+
+.porta-de-cuidado--destaque:hover {
+  background-color: var(--cor-acento-escura);
+}
+
+/* Ação principal marcada (acento) */
+.botao-criar-gemeo-digital,
+.acesso-ao-zelinho {
+  background-color: var(--cor-acento);
+  color: var(--cor-texto);
+  border-radius: 1.25rem;
+}
+
+.botao-criar-gemeo-digital:hover,
+.acesso-ao-zelinho:hover {
+  background-color: var(--cor-acento-escura);
+}
+
+/* Informativo, não-clicável (respiro) */
+.faixa-de-agendamento {
+  background-color: var(--cor-respiro);
+  color: var(--cor-texto);
+  border-radius: 0.5rem; /* raio discreto — não é botão */
+}
