@@ -68,3 +68,34 @@ body {
   color: var(--cor-texto);
   border-radius: 0.5rem; /* raio discreto — não é botão */
 }
+
+/* Estados: carregando, erro, desabilitado */
+.faixa-de-agendamento--carregando {
+  opacity: 0.6;
+}
+
+.faixa-de-agendamento--erro {
+  background-color: transparent;
+  border: 1px solid var(--cor-acento-escura);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tela-login__erro,
+.botao-criar-gemeo-digital__erro,
+.botao-adicionar-foto-real__erro {
+  color: var(--cor-acento-escura);
+  font-size: var(--tamanho-corpo-sm);
+}
+
+.galeria-de-racas__item--selecionado {
+  outline: 2px solid var(--cor-acento);
+}
+
+.botao-adicionar-foto-real__preview {
+  border-radius: 1rem;
+  max-width: 100%;
+}
