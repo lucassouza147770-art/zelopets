@@ -1,0 +1,37 @@
+/* A porta destacada é o único controle que responde com movimento. */
+.porta-de-cuidado--destaque {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.porta-de-cuidado--destaque:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.porta-de-cuidado--destaque:active {
+  transform: scale(0.97);
+}
+
+/* A faixa sinaliza a chegada do dado sem animar a tela inteira. */
+@keyframes revelar-agendamento {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.faixa-de-agendamento:not(.faixa-de-agendamento--carregando) {
+  animation: revelar-agendamento 320ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .porta-de-cuidado--destaque,
+  .faixa-de-agendamento:not(.faixa-de-agendamento--carregando) {
+    animation: none;
+    transition: none;
+  }
+}
