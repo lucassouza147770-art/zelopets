@@ -4,6 +4,9 @@
 /frontend/node_modules
 /build
 /frontend/dist
+/ml-service/.venv
+/ml-service/app/modelo_kmeans.joblib
+/ml-service/app/elbow_e_silhouette.png
 
 # TypeScript build cache
 *.tsbuildinfo
