@@ -77,5 +77,5 @@ export function TelaCadastroDoPet() {
     }
   }
 
-  return <div className="tela-cadastro-do-pet"><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} /></div>
+  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} /></main>
 }

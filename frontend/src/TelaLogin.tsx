@@ -27,7 +27,7 @@ export function TelaLogin() {
   }
 
   return (
-    <div className="tela-login">
+    <main className="tela-login">
       <h1>ZeloPets</h1>
       {modo === 'registro' && (
         <label>
@@ -50,6 +50,6 @@ export function TelaLogin() {
       <button type="button" onClick={() => setModo(modo === 'login' ? 'registro' : 'login')}>
         {modo === 'login' ? 'Ainda não tenho conta' : 'Já tenho conta'}
       </button>
-    </div>
+    </main>
   )
 }

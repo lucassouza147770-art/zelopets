@@ -7,6 +7,8 @@
 /ml-service/.venv
 /ml-service/app/modelo_kmeans.joblib
 /ml-service/app/elbow_e_silhouette.png
+ml-service/**/__pycache__/
+*.pyc
 
 # TypeScript build cache
 *.tsbuildinfo

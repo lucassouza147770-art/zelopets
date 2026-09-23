@@ -88,5 +88,5 @@ export function PainelDoTutor() {
     return () => clearTimeout(tempo)
   }, [])
 
-  return <div className="painel-do-tutor"><SaudacaoDoZelo tutorNome={tutorNome} petAtivo={petAtivo} /><FaixaDeAgendamento estado={estadoAgendamento} /><TrilhaDePortas itens={produtos} /><AcessoAoZelinho /></div>
+  return <main className="painel-do-tutor"><SaudacaoDoZelo tutorNome={tutorNome} petAtivo={petAtivo} /><FaixaDeAgendamento estado={estadoAgendamento} /><TrilhaDePortas itens={produtos} /><AcessoAoZelinho /></main>
 }

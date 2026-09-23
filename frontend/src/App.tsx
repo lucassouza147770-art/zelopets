@@ -6,7 +6,7 @@ import { TelaLogin } from './TelaLogin'
 export function App() {
   const [tela, setTela] = useState<'login' | 'painel' | 'pet'>('login')
 
-  return <main className="aplicacao">
+  return <div className="aplicacao">
     <nav className="navegacao-de-desenvolvimento" aria-label="Navegação das telas">
       <button type="button" onClick={() => setTela('login')}>Login</button>
       <button type="button" onClick={() => setTela('painel')}>Painel do tutor</button>
@@ -15,5 +15,5 @@ export function App() {
     {tela === 'login' && <TelaLogin />}
     {tela === 'painel' && <PainelDoTutor />}
     {tela === 'pet' && <TelaCadastroDoPet />}
-  </main>
+  </div>
 }
