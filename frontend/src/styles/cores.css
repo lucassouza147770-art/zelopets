@@ -91,6 +91,11 @@ button:disabled {
   font-size: var(--tamanho-corpo-sm);
 }
 
+.botao-criar-gemeo-digital__sucesso {
+  color: var(--cor-dominante-escura);
+  font-size: var(--tamanho-corpo-sm);
+}
+
 .galeria-de-racas__item--selecionado {
   outline: 2px solid var(--cor-acento);
 }

@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react'
+import { api } from './api/client'
+import { obterToken } from './api/auth'
 
 type Pet = {
   nome: string
   fotoUrl?: string
 }
+
+type EstadoPetAtivo =
+  | { tipo: 'carregando' }
+  | { tipo: 'sem-pet' }
+  | { tipo: 'erro' }
+  | { tipo: 'ok'; pet: Pet }
 
 type EstadoAgendamento =
   | { tipo: 'carregando' }
@@ -38,13 +46,25 @@ function RetratoDoPet({ pet }: { pet: Pet }) {
   )
 }
 
-function SaudacaoDoZelo({ tutorNome, petAtivo }: { tutorNome: string; petAtivo: Pet }) {
+function SaudacaoDoZelo({ tutorNome, estadoPet }: { tutorNome: string; estadoPet: EstadoPetAtivo }) {
+  if (estadoPet.tipo === 'carregando') {
+    return <header className="saudacao-do-zelo" aria-busy="true"><p>Carregando seu pet...</p></header>
+  }
+
+  if (estadoPet.tipo === 'sem-pet') {
+    return <header className="saudacao-do-zelo"><div><p>Olá, {tutorNome}!</p><h1>Cadastre seu primeiro pet pra começar</h1></div></header>
+  }
+
+  if (estadoPet.tipo === 'erro') {
+    return <header className="saudacao-do-zelo"><div><p>Olá, {tutorNome}!</p><h1>Não deu pra carregar seus pets agora</h1></div></header>
+  }
+
   return (
     <header className="saudacao-do-zelo">
-      <RetratoDoPet pet={petAtivo} />
+      <RetratoDoPet pet={estadoPet.pet} />
       <div>
         <p>Olá, {tutorNome}!</p>
-        <h1>Qual cuidado o {petAtivo.nome} precisa hoje?</h1>
+        <h1>Qual cuidado o {estadoPet.pet.nome} precisa hoje?</h1>
       </div>
     </header>
   )
@@ -77,16 +97,30 @@ function AcessoAoZelinho() {
 
 export function PainelDoTutor() {
   const tutorNome = 'Lucas'
-  const petAtivo: Pet = { nome: 'Thor' }
+  const [estadoPet, setEstadoPet] = useState<EstadoPetAtivo>({ tipo: 'carregando' })
   const [estadoAgendamento, setEstadoAgendamento] = useState<EstadoAgendamento>({ tipo: 'carregando' })
 
   useEffect(() => {
+    const token = obterToken()
+    if (!token) {
+      setEstadoPet({ tipo: 'erro' })
+      return
+    }
+
+    api
+      .get<Pet[]>('/pets', token)
+      .then((pets) => setEstadoPet(pets.length === 0 ? { tipo: 'sem-pet' } : { tipo: 'ok', pet: pets[0] }))
+      .catch(() => setEstadoPet({ tipo: 'erro' }))
+  }, [])
+
+  useEffect(() => {
+    // Ainda simulado: não existe endpoint de agendamentos nesta etapa.
     // simulação da chamada à API — troca pelo fetch real na etapa de integração
     const tempo = setTimeout(() => {
-      setEstadoAgendamento({ tipo: 'ok', dado: { petNome: 'Thor', servico: 'Passeio', horario: '15:30' } })
+      setEstadoAgendamento({ tipo: 'vazio' })
     }, 600)
     return () => clearTimeout(tempo)
   }, [])
 
-  return <main className="painel-do-tutor"><SaudacaoDoZelo tutorNome={tutorNome} petAtivo={petAtivo} /><FaixaDeAgendamento estado={estadoAgendamento} /><TrilhaDePortas itens={produtos} /><AcessoAoZelinho /></main>
+  return <main className="painel-do-tutor"><SaudacaoDoZelo tutorNome={tutorNome} estadoPet={estadoPet} /><FaixaDeAgendamento estado={estadoAgendamento} /><TrilhaDePortas itens={produtos} /><AcessoAoZelinho /></main>
 }

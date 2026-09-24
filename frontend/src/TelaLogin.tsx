@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { api, ApiError } from './api/client'
+import { salvarToken } from './api/auth'
 
 type EstadoEnvio = 'ocioso' | 'enviando' | 'erro'
 
@@ -14,15 +16,14 @@ export function TelaLogin() {
     setEstado('enviando')
     setMensagemErro(null)
     try {
-      // integração com POST /auth/login ou /auth/registro entra numa etapa futura
+      const rota = modo === 'login' ? '/auth/login' : '/auth/registro'
+      const corpo = modo === 'login' ? { email, senha } : { nome, email, senha }
+      const resposta = await api.post<{ accessToken: string }>(rota, corpo)
+      salvarToken(resposta.accessToken)
       setEstado('ocioso')
-    } catch {
+    } catch (erro) {
       setEstado('erro')
-      setMensagemErro(
-        modo === 'login'
-          ? 'Não deu pra entrar. Confira o e-mail e a senha.'
-          : 'Não deu pra criar a conta agora.',
-      )
+      setMensagemErro(erro instanceof ApiError ? erro.message : 'Não deu pra conectar com o servidor.')
     }
   }
 

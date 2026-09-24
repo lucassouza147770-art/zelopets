@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { api, ApiError } from './api/client'
+import { obterToken } from './api/auth'
 
 type Raca = { id: string; nome: string; iconeUrl: string }
 const racasComuns: Raca[] = [
@@ -39,7 +41,7 @@ function DetalhesOpcionais({ aberto, onAlternar }: { aberto: boolean; onAlternar
   return <section className="detalhes-opcionais"><button type="button" onClick={onAlternar}>{aberto ? 'Ocultar detalhes' : 'Adicionar mais detalhes (opcional)'}</button>{aberto && <div className="detalhes-opcionais__conteudo"><label>Raça específica<input type="text" /></label><label>Peso (kg)<input type="number" /></label><label>Restrições alimentares<input type="text" placeholder="ex: alergia a frango" /></label><label>Comportamento<input type="text" placeholder="ex: ansioso, sociável" /></label></div>}</section>
 }
 
-type EstadoEnvio = 'ocioso' | 'enviando' | 'erro'
+type EstadoEnvio = 'ocioso' | 'enviando' | 'erro' | 'sucesso'
 
 function BotaoCriarGemeoDigital({ nomePet, habilitado, estado, onClick }: { nomePet: string; habilitado: boolean; estado: EstadoEnvio; onClick: () => void }) {
   return <div className="botao-criar-gemeo-digital-wrapper"><button className="botao-criar-gemeo-digital" type="button" onClick={onClick} disabled={!habilitado || estado === 'enviando'}>{estado === 'enviando' ? 'Criando perfil...' : nomePet ? `Criar perfil do ${nomePet}` : 'Criar perfil do pet'}</button>{estado === 'erro' && <p className="botao-criar-gemeo-digital__erro">Não deu pra criar o perfil agora. Tenta de novo.</p>}</div>
@@ -70,12 +72,21 @@ export function TelaCadastroDoPet() {
   async function handleCriarGemeoDigital() {
     setEstadoEnvio('enviando')
     try {
-      // integração com POST /pets entra numa etapa futura
-      setEstadoEnvio('ocioso')
-    } catch {
+      const token = obterToken()
+      await api.post('/pets', { nome, porte, nivelEnergia }, token ?? undefined)
+      setEstadoEnvio('sucesso')
+      setNome('')
+      setPorte(null)
+      setNivelEnergia(null)
+      setRacaSelecionada(null)
+      setEstadoFoto({ tipo: 'ociosa' })
+    } catch (erro) {
       setEstadoEnvio('erro')
+      if (erro instanceof ApiError && erro.status === 401) {
+        setEstadoEnvio('erro')
+      }
     }
   }
 
-  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} /></main>
+  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} />{estadoEnvio === 'sucesso' && <p className="botao-criar-gemeo-digital__sucesso">Perfil criado!</p>}</main>
 }
