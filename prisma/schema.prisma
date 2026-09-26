@@ -142,6 +142,8 @@ model Prestador {
   bio             String?
   experienciaAnos Int           @default(0)
   avaliacaoMedia  Float         @default(0)
+  portesAtendidos        Porte[]       @default([])
+  niveisEnergiaAtendidos NivelEnergia[] @default([])
   fotoUrl         String?
   ativo           Boolean       @default(true)
   criadoEm        DateTime      @default(now())

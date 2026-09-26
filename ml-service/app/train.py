@@ -10,7 +10,6 @@ controlado e usado somente para validar a pipeline mecanica.
 
 from __future__ import annotations
 
-import os
 import random
 from pathlib import Path
 
@@ -18,11 +17,11 @@ import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy import sparse
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-from features import montar_matriz_multi_label, montar_pipeline_features, pets_para_dataframe
+from db import buscar_todos_os_pets
+from features import montar_matriz, montar_pipeline_features, pets_para_dataframe, treinar_binarizadores
 
 BASE_DIR = Path(__file__).resolve().parent
 MODELO_PATH = BASE_DIR / "modelo_kmeans.joblib"
@@ -33,29 +32,6 @@ PORTES = ["PEQUENO", "MEDIO", "GRANDE"]
 NIVEIS_ENERGIA = ["BAIXO", "MEDIO", "ALTO"]
 RESTRICOES_POSSIVEIS = ["alergia a frango", "sem gluten", "nenhuma"]
 COMPORTAMENTOS_POSSIVEIS = ["sociavel", "ansioso", "medroso", "brincalhao"]
-
-
-def carregar_pets_do_banco() -> list[dict]:
-    database_url = os.environ.get("DATABASE_URL")
-    if not database_url:
-        return []
-
-    import psycopg2
-    import psycopg2.extras
-
-    conexao = psycopg2.connect(database_url)
-    try:
-        with conexao.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-            cursor.execute(
-                """
-                SELECT id, porte, "nivelEnergia", raca, "pesoKg",
-                       "dataNascimento", "restricoesAlimentares", comportamento
-                FROM "Pet"
-                """
-            )
-            return [dict(linha) for linha in cursor.fetchall()]
-    finally:
-        conexao.close()
 
 
 def gerar_pets_simulados(quantidade: int = 60) -> list[dict]:
@@ -75,17 +51,6 @@ def gerar_pets_simulados(quantidade: int = 60) -> list[dict]:
             }
         )
     return pets
-
-
-def montar_matriz_final(df: pd.DataFrame, pipeline_features) -> np.ndarray:
-    matriz_principal = pipeline_features.fit_transform(df)
-    if sparse.issparse(matriz_principal):
-        matriz_principal = matriz_principal.toarray()
-
-    matriz_multi_label = montar_matriz_multi_label(df)
-    if matriz_multi_label.empty:
-        return np.asarray(matriz_principal)
-    return np.hstack([matriz_principal, matriz_multi_label.to_numpy()])
 
 
 def gerar_grafico_cotovelo_e_silhouette(matriz: np.ndarray, k_min: int = 2, k_max: int = 10) -> int:
@@ -118,7 +83,12 @@ def gerar_grafico_cotovelo_e_silhouette(matriz: np.ndarray, k_min: int = 2, k_ma
 
 
 def main() -> None:
-    pets = carregar_pets_do_banco()
+    try:
+        pets = buscar_todos_os_pets()
+    except Exception as erro:
+        print(f"Nao foi possivel ler o banco ({erro}) - usando dataset simulado.")
+        pets = []
+
     fonte = "banco real"
     if len(pets) < 20:
         print(f"So {len(pets)} pets no banco - usando dataset simulado para validar a pipeline.")
@@ -127,7 +97,8 @@ def main() -> None:
 
     df = pets_para_dataframe(pets)
     pipeline_features = montar_pipeline_features()
-    matriz = montar_matriz_final(df, pipeline_features)
+    binarizadores = treinar_binarizadores(df)
+    matriz = montar_matriz(df, pipeline_features, binarizadores, treinando=True)
     melhor_k = gerar_grafico_cotovelo_e_silhouette(matriz)
 
     modelo_final = KMeans(n_clusters=melhor_k, random_state=42, n_init=10)
@@ -135,6 +106,7 @@ def main() -> None:
     joblib.dump(
         {
             "pipeline_features": pipeline_features,
+            "binarizadores": binarizadores,
             "kmeans": modelo_final,
             "k_escolhido": melhor_k,
             "fonte_dos_dados": fonte,

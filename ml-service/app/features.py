@@ -10,7 +10,9 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
+import numpy as np
 import pandas as pd
+from scipy import sparse
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MultiLabelBinarizer, OneHotEncoder, StandardScaler
 
@@ -55,12 +57,60 @@ def montar_pipeline_features() -> ColumnTransformer:
     )
 
 
-def montar_matriz_multi_label(df: pd.DataFrame) -> pd.DataFrame:
-    """Transforma cada item das listas em uma coluna binaria 0/1."""
-    partes = []
+def treinar_binarizadores(df: pd.DataFrame) -> dict[str, MultiLabelBinarizer]:
+    """Ajusta os binarizadores uma vez, apenas durante o treinamento."""
+    binarizadores = {}
     for coluna in COLUNAS_MULTI_LABEL:
         binarizador = MultiLabelBinarizer()
-        binarizado = binarizador.fit_transform(df[coluna])
+        binarizador.fit(df[coluna])
+        binarizadores[coluna] = binarizador
+    return binarizadores
+
+
+def aplicar_binarizadores(
+    df: pd.DataFrame, binarizadores: dict[str, MultiLabelBinarizer]
+) -> pd.DataFrame:
+    """Aplica os binarizadores salvos no treino, sem reajustá-los na inferência."""
+    partes = []
+    for coluna in COLUNAS_MULTI_LABEL:
+        binarizador = binarizadores[coluna]
+        binarizado = binarizador.transform(df[coluna])
         nomes_colunas = [f"{coluna}__{classe}" for classe in binarizador.classes_]
         partes.append(pd.DataFrame(binarizado, columns=nomes_colunas, index=df.index))
     return pd.concat(partes, axis=1) if partes else pd.DataFrame(index=df.index)
+
+
+def montar_matriz(
+    df: pd.DataFrame,
+    pipeline_features: ColumnTransformer,
+    binarizadores: dict[str, MultiLabelBinarizer],
+    treinando: bool,
+) -> np.ndarray:
+    """Gera treino e inferência com o mesmo pipeline e as mesmas colunas."""
+    if treinando:
+        matriz_principal = pipeline_features.fit_transform(df)
+    else:
+        matriz_principal = pipeline_features.transform(df)
+
+    if sparse.issparse(matriz_principal):
+        matriz_principal = matriz_principal.toarray()
+    matriz_principal = np.asarray(matriz_principal)
+
+    matriz_multi_label = aplicar_binarizadores(df, binarizadores)
+    if matriz_multi_label.empty:
+        return matriz_principal
+    return np.hstack([matriz_principal, matriz_multi_label.to_numpy()])
+
+
+def interpretar_centroide(
+    centroide: np.ndarray, pipeline_features: ColumnTransformer
+) -> dict[str, str]:
+    """Decodifica as categorias mais representativas do centroide."""
+    encoder: OneHotEncoder = pipeline_features.named_transformers_["categoricas"]
+    resultado = {}
+    indice = 0
+    for coluna, categorias in zip(COLUNAS_CATEGORICAS, encoder.categories_):
+        fatia = centroide[indice : indice + len(categorias)]
+        resultado[coluna] = str(categorias[int(fatia.argmax())])
+        indice += len(categorias)
+    return resultado

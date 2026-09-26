@@ -21,11 +21,13 @@ O recurso `prestadores` representa passeadores e hotéis disponíveis para recom
   "tipo": "PASSEADOR",
   "bio": "Passeios individuais e em pequenos grupos.",
   "experienciaAnos": 5,
+  "portesAtendidos": ["PEQUENO", "MEDIO"],
+  "niveisEnergiaAtendidos": ["BAIXO", "MEDIO"],
   "fotoUrl": "https://exemplo.com/passeador.jpg"
 }
 ```
 
-`nome` e `tipo` são obrigatórios. `tipo` aceita somente `PASSEADOR` e `HOTEL`; `experienciaAnos` deve ser um inteiro maior ou igual a zero.
+`nome` e `tipo` são obrigatórios. `tipo` aceita somente `PASSEADOR` e `HOTEL`; `experienciaAnos` deve ser um inteiro maior ou igual a zero. `portesAtendidos` aceita `PEQUENO`, `MEDIO` e `GRANDE`; `niveisEnergiaAtendidos` aceita `BAIXO`, `MEDIO` e `ALTO`. Os dois arrays são opcionais e começam vazios.
 
 ## Teste rápido
 
