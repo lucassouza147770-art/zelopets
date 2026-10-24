@@ -9,7 +9,9 @@
   /* Dominante — Verde ZeloPets. Usado nas superfícies estruturais:
      cabeçalho da saudação, fundo das portas de cuidado, navegação. */
   --cor-dominante: #2F7A5C;
-  --cor-dominante-escura: #27644B; /* hover/pressed */
+  --cor-dominante-escura: #1F5A43; /* hover/pressed */
+  --cor-menta-clara: #E4F3EA;
+  --cor-superficie: #F6F7F4;
 
   /* Acento marcado — Âmbar Caramelo. Reservado só pra ação mais
      importante da tela: CTA de criar o gêmeo digital, acesso ao
@@ -17,6 +19,8 @@
      ela para de significar "isso aqui importa mais". */
   --cor-acento: #E0A24B;
   --cor-acento-escura: #D18924; /* hover/pressed */
+  --cor-acento-suave: #FBEBCB;
+  --cor-texto-suave: #55625A;
 
   /* Respiro pontual — Verde-menta. Só pra elementos informativos,
      não-clicáveis (ex: a faixa de status do próximo agendamento). */
@@ -25,6 +29,7 @@
 }
 
 body {
+  margin: 0;
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
 }
@@ -37,16 +42,8 @@ body {
   border-radius: 1.25rem; /* raio generoso — é clicável/estrutural */
 }
 
-.porta-de-cuidado--destaque {
-  background-color: var(--cor-acento);
-}
-
 .porta-de-cuidado:hover {
   background-color: var(--cor-dominante-escura);
-}
-
-.porta-de-cuidado--destaque:hover {
-  background-color: var(--cor-acento-escura);
 }
 
 /* Ação principal marcada (acento) */
@@ -77,6 +74,32 @@ body {
 .faixa-de-agendamento--erro {
   background-color: transparent;
   border: 1px solid var(--cor-acento-escura);
+}
+
+.chip-status {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--tamanho-corpo-sm);
+  font-weight: 600;
+}
+
+.chip-status--agendado {
+  background-color: #DDF0E5;
+  color: var(--cor-dominante-escura);
+}
+
+.chip-status--pendente {
+  background-color: var(--cor-acento-suave);
+  color: #7A4B00;
+}
+
+.chip-status--cancelado {
+  background-color: #FBE3E0;
+  color: #8A2E2E;
 }
 
 button:disabled {

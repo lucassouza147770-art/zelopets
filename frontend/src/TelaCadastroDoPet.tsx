@@ -47,7 +47,13 @@ function BotaoCriarGemeoDigital({ nomePet, habilitado, estado, onClick }: { nome
   return <div className="botao-criar-gemeo-digital-wrapper"><button className="botao-criar-gemeo-digital" type="button" onClick={onClick} disabled={!habilitado || estado === 'enviando'}>{estado === 'enviando' ? 'Criando perfil...' : nomePet ? `Criar perfil do ${nomePet}` : 'Criar perfil do pet'}</button>{estado === 'erro' && <p className="botao-criar-gemeo-digital__erro">Não deu pra criar o perfil agora. Tenta de novo.</p>}</div>
 }
 
-export function TelaCadastroDoPet() {
+export function TelaCadastroDoPet({
+  onPetCriado,
+  onSessaoExpirada,
+}: {
+  onPetCriado: () => void
+  onSessaoExpirada: () => void
+}) {
   const [racaSelecionada, setRacaSelecionada] = useState<string | null>(null)
   const [estadoFoto, setEstadoFoto] = useState<EstadoFoto>({ tipo: 'ociosa' })
   const [nome, setNome] = useState('')
@@ -73,8 +79,13 @@ export function TelaCadastroDoPet() {
     setEstadoEnvio('enviando')
     try {
       const token = obterToken()
-      await api.post('/pets', { nome, porte, nivelEnergia }, token ?? undefined)
+      if (!token) {
+        onSessaoExpirada()
+        return
+      }
+      await api.post('/pets', { nome, porte, nivelEnergia }, token)
       setEstadoEnvio('sucesso')
+      onPetCriado()
       setNome('')
       setPorte(null)
       setNivelEnergia(null)
@@ -83,10 +94,10 @@ export function TelaCadastroDoPet() {
     } catch (erro) {
       setEstadoEnvio('erro')
       if (erro instanceof ApiError && erro.status === 401) {
-        setEstadoEnvio('erro')
+        onSessaoExpirada()
       }
     }
   }
 
-  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} />{estadoEnvio === 'sucesso' && <p className="botao-criar-gemeo-digital__sucesso">Perfil criado!</p>}</main>
+  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} />{estadoEnvio === 'sucesso' && <p className="botao-criar-gemeo-digital__sucesso">Perfil criado.</p>}</main>
 }

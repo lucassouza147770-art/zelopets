@@ -1,126 +1,548 @@
 import { useEffect, useState } from 'react'
-import { api } from './api/client'
+import {
+  CalendarDays,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  CircleDollarSign,
+  Clock3,
+  House,
+  MessageCircle,
+  PawPrint,
+  UserRound,
+  Footprints,
+  Package,
+} from 'lucide-react'
+import { ApiError, api } from './api/client'
 import { obterToken } from './api/auth'
+import { obterProximoCuidado, type Cuidado } from './api/agenda'
+import { obterTutor, type Tutor } from './api/tutor'
 
 type Pet = {
+  id: string
   nome: string
-  fotoUrl?: string
+  fotoUrl?: string | null
 }
 
-type EstadoPetAtivo =
-  | { tipo: 'carregando' }
-  | { tipo: 'sem-pet' }
-  | { tipo: 'erro' }
-  | { tipo: 'ok'; pet: Pet }
+type EstadoRecurso = 'carregando' | 'ok' | 'erro'
+type ServicoId = 'mobilidade' | 'hotel' | 'nutricao'
+export type TelaPrincipal = 'inicio' | 'agenda' | 'zelinho' | 'perfil'
 
-type EstadoAgendamento =
-  | { tipo: 'carregando' }
-  | { tipo: 'vazio' }
-  | { tipo: 'erro' }
-  | {
-      tipo: 'ok'
-      dado: {
-        petNome: string
-        servico: 'Passeio' | 'Hospedagem' | 'Nutrição'
-        horario: string
-      }
-    }
+type Props = {
+  onAbrirCarteira?: () => void
+  onAbrirPerfil?: () => void
+  onAbrirAgenda?: () => void
+  onAbrirZelinho?: () => void
+  onAbrirServico?: (servico: ServicoId) => void
+  onCadastrarPet?: () => void
+  onSessaoExpirada?: () => void
+}
 
-type Produto = {
-  id: 'mobilidade' | 'hospedagem' | 'nutricao'
+const CHAVE_PET_ATIVO = 'zelopets:petAtivoId'
+
+const servicos: {
+  id: ServicoId
   titulo: string
   descricao: string
-}
-
-const produtos: Produto[] = [
-  { id: 'mobilidade', titulo: 'Passeio ou transporte', descricao: 'Agende um passeio pro seu pet' },
-  { id: 'hospedagem', titulo: 'Hospedagem', descricao: 'Reserve uma estadia no Hotel ZeloPets' },
-  { id: 'nutricao', titulo: 'Plano alimentar', descricao: 'Assine uma entrega de ração personalizada' },
+  Icone: typeof Footprints
+}[] = [
+  {
+    id: 'mobilidade',
+    titulo: 'Mobilidade',
+    descricao: 'Passeios e transporte do pet',
+    Icone: Footprints,
+  },
+  {
+    id: 'hotel',
+    titulo: 'Hotel ZeloPets',
+    descricao: 'Hospedagem com pacotes',
+    Icone: House,
+  },
+  {
+    id: 'nutricao',
+    titulo: 'Nutrição',
+    descricao: 'Plano alimentar por assinatura',
+    Icone: Package,
+  },
 ]
 
-function RetratoDoPet({ pet }: { pet: Pet }) {
+function formatarMoedas(saldo: number) {
+  return saldo.toLocaleString('pt-BR')
+}
+
+function formatarData(dataHora: string) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(dataHora))
+}
+
+function nomeDoServico(tipo: Cuidado['tipo']) {
+  switch (tipo) {
+    case 'PASSEIO':
+      return 'Passeio'
+    case 'HOSPEDAGEM':
+      return 'Hospedagem'
+    case 'NUTRICAO':
+      return 'Nutrição'
+  }
+}
+
+function isSessaoExpirada(erro: unknown) {
+  return erro instanceof ApiError && erro.status === 401
+}
+
+function ChipZeloCoins({
+  tutor,
+  estadoTutor,
+  onAbrirCarteira,
+}: {
+  tutor: Tutor | null
+  estadoTutor: EstadoRecurso
+  onAbrirCarteira?: () => void
+}) {
   return (
-    <div className="retrato-do-pet">
-      {pet.fotoUrl ? <img src={pet.fotoUrl} alt={pet.nome} /> : <span aria-hidden>{pet.nome.charAt(0)}</span>}
-    </div>
+    <button
+      className="chip-zelocoins"
+      type="button"
+      onClick={onAbrirCarteira}
+      aria-label={
+        estadoTutor === 'erro'
+          ? 'Abrir carteira; saldo indisponível'
+          : `Abrir carteira; saldo de ${tutor ? formatarMoedas(tutor.zeloCoins) : 'carregando'} ZeloCoins`
+      }
+      aria-busy={estadoTutor === 'carregando'}
+    >
+      <CircleDollarSign aria-hidden="true" size={18} />
+      <span>{estadoTutor === 'erro' ? 'Indisponível' : tutor ? formatarMoedas(tutor.zeloCoins) : '...'}</span>
+    </button>
   )
 }
 
-function SaudacaoDoZelo({ tutorNome, estadoPet }: { tutorNome: string; estadoPet: EstadoPetAtivo }) {
-  if (estadoPet.tipo === 'carregando') {
-    return <header className="saudacao-do-zelo" aria-busy="true"><p>Carregando seu pet...</p></header>
-  }
-
-  if (estadoPet.tipo === 'sem-pet') {
-    return <header className="saudacao-do-zelo"><div><p>Olá, {tutorNome}!</p><h1>Cadastre seu primeiro pet pra começar</h1></div></header>
-  }
-
-  if (estadoPet.tipo === 'erro') {
-    return <header className="saudacao-do-zelo"><div><p>Olá, {tutorNome}!</p><h1>Não deu pra carregar seus pets agora</h1></div></header>
-  }
-
+function BotaoPerfil({ onAbrirPerfil }: { onAbrirPerfil?: () => void }) {
   return (
-    <header className="saudacao-do-zelo">
-      <RetratoDoPet pet={estadoPet.pet} />
-      <div>
-        <p>Olá, {tutorNome}!</p>
-        <h1>Qual cuidado o {estadoPet.pet.nome} precisa hoje?</h1>
+    <button className="botao-perfil" type="button" onClick={onAbrirPerfil} aria-label="Abrir perfil">
+      <UserRound aria-hidden="true" size={21} />
+    </button>
+  )
+}
+
+function CabecalhoZelo({
+  tutor,
+  estadoTutor,
+  onAbrirCarteira,
+  onAbrirPerfil,
+}: {
+  tutor: Tutor | null
+  estadoTutor: EstadoRecurso
+  onAbrirCarteira?: () => void
+  onAbrirPerfil?: () => void
+}) {
+  return (
+    <header className="cabecalho-zelo">
+      <div className="marca-zelopets">
+        <PawPrint aria-hidden="true" size={24} />
+        <span>ZeloPets</span>
+      </div>
+      <div className="cabecalho-zelo__acoes">
+        <ChipZeloCoins tutor={tutor} estadoTutor={estadoTutor} onAbrirCarteira={onAbrirCarteira} />
+        <BotaoPerfil onAbrirPerfil={onAbrirPerfil} />
       </div>
     </header>
   )
 }
 
-function FaixaDeAgendamento({ estado }: { estado: EstadoAgendamento }) {
-  if (estado.tipo === 'carregando') {
-    return <section className="faixa-de-agendamento faixa-de-agendamento--carregando" aria-busy="true"><p>Buscando seus agendamentos...</p></section>
+function SeletorDePet({
+  petAtivo,
+  pets,
+  onSelecionarPet,
+}: {
+  petAtivo: Pet
+  pets: Pet[]
+  onSelecionarPet: (petId: string) => void
+}) {
+  return (
+    <label className="seletor-de-pet">
+      <span className="seletor-de-pet__avatar" aria-hidden="true">
+        {petAtivo.fotoUrl ? (
+          <img src={petAtivo.fotoUrl} alt="" />
+        ) : (
+          petAtivo.nome.charAt(0).toLocaleUpperCase('pt-BR')
+        )}
+      </span>
+      <span className="sr-only">Selecionar cão ativo</span>
+      <select
+        value={petAtivo.id}
+        onChange={(evento) => onSelecionarPet(evento.target.value)}
+        aria-label="Selecionar cão ativo"
+      >
+        {pets.map((pet) => (
+          <option key={pet.id} value={pet.id}>
+            {pet.nome}
+          </option>
+        ))}
+      </select>
+      <ChevronDown aria-hidden="true" size={16} />
+    </label>
+  )
+}
+
+function SaudacaoComPet({
+  tutor,
+  estadoTutor,
+  pets,
+  estadoPets,
+  petAtivoId,
+  onSelecionarPet,
+  onCadastrarPet,
+}: {
+  tutor: Tutor | null
+  estadoTutor: EstadoRecurso
+  pets: Pet[]
+  estadoPets: EstadoRecurso
+  petAtivoId: string | null
+  onSelecionarPet: (petId: string) => void
+  onCadastrarPet?: () => void
+}) {
+  const petAtivo = pets.find((pet) => pet.id === petAtivoId) ?? pets[0]
+
+  return (
+    <section className="saudacao-com-pet" aria-labelledby="titulo-home">
+      <div className="saudacao-com-pet__texto">
+        <p className="saudacao-com-pet__ola">
+          {estadoTutor === 'carregando'
+            ? 'Carregando seu perfil'
+            : estadoTutor === 'erro'
+              ? 'Olá'
+              : `Olá, ${tutor?.nome ?? ''}`}
+        </p>
+        {estadoTutor === 'erro' ? (
+          <>
+            <h1 id="titulo-home">Não foi possível carregar seu perfil</h1>
+            <p className="mensagem-de-erro">Tente novamente em instantes.</p>
+          </>
+        ) : estadoPets === 'carregando' ? (
+          <h1 id="titulo-home" aria-busy="true">Carregando os dados do seu cão</h1>
+        ) : estadoPets === 'erro' ? (
+          <>
+            <h1 id="titulo-home">Não foi possível carregar seus cães</h1>
+            <p className="mensagem-de-erro">Tente novamente em instantes.</p>
+          </>
+        ) : pets.length === 0 ? (
+          <>
+            <h1 id="titulo-home">Cadastre seu primeiro cão para começar</h1>
+            <button className="acao-secundaria" type="button" onClick={onCadastrarPet}>
+              Cadastrar cão
+            </button>
+          </>
+        ) : (
+          <h1 id="titulo-home">Qual cuidado o {petAtivo?.nome} precisa hoje?</h1>
+        )}
+      </div>
+      {estadoPets === 'ok' && pets.length > 0 && petAtivo && (
+        <SeletorDePet petAtivo={petAtivo} pets={pets} onSelecionarPet={onSelecionarPet} />
+      )}
+    </section>
+  )
+}
+
+function ChipDeStatus({ status }: { status: string }) {
+  const pendente = status === 'PENDENTE'
+  const texto = pendente ? 'Pendente' : status === 'ATIVA' ? 'Ativa' : 'Agendado'
+  const Icone = pendente ? Clock3 : CheckCircle2
+
+  return (
+    <span className={`chip-status ${pendente ? 'chip-status--pendente' : 'chip-status--agendado'}`}>
+      <Icone aria-hidden="true" size={15} />
+      {texto}
+    </span>
+  )
+}
+
+function CartaoProximoCuidado({
+  cuidado,
+  estado,
+}: {
+  cuidado: Cuidado | null
+  estado: EstadoRecurso
+}) {
+  if (estado === 'carregando') {
+    return (
+      <section className="cartao-proximo-cuidado cartao-proximo-cuidado--carregando" aria-busy="true">
+        <CalendarDays aria-hidden="true" size={24} />
+        <p>Buscando o próximo cuidado...</p>
+      </section>
+    )
   }
-  if (estado.tipo === 'erro') {
-    return <section className="faixa-de-agendamento faixa-de-agendamento--erro"><p>Não deu pra carregar seus agendamentos agora.</p></section>
+
+  if (estado === 'erro') {
+    return (
+      <section className="cartao-proximo-cuidado cartao-proximo-cuidado--erro" role="status">
+        <CalendarDays aria-hidden="true" size={24} />
+        <div>
+          <h2>Próximo cuidado</h2>
+          <p>Não foi possível carregar a agenda. Tente novamente.</p>
+        </div>
+      </section>
+    )
   }
-  if (estado.tipo === 'vazio') {
-    return <section className="faixa-de-agendamento faixa-de-agendamento--vazia"><p>Nenhum agendamento no momento</p></section>
+
+  if (!cuidado) {
+    return (
+      <section className="cartao-proximo-cuidado cartao-proximo-cuidado--vazio">
+        <CalendarDays aria-hidden="true" size={24} />
+        <div>
+          <h2>Próximo cuidado</h2>
+          <p>Nenhum cuidado agendado. Que tal um passeio?</p>
+        </div>
+      </section>
+    )
   }
-  return <section className="faixa-de-agendamento"><p>Próximo agendamento</p><p>{estado.dado.petNome} · {estado.dado.servico} · {estado.dado.horario}</p></section>
+
+  return (
+    <section className="cartao-proximo-cuidado">
+      <CalendarDays aria-hidden="true" size={24} />
+      <div className="cartao-proximo-cuidado__conteudo">
+        <p className="cartao-proximo-cuidado__data">{formatarData(cuidado.dataHora)}</p>
+        <h2>{nomeDoServico(cuidado.tipo)} com {cuidado.petNome}</h2>
+      </div>
+      <ChipDeStatus status={cuidado.status} />
+    </section>
+  )
 }
 
-function PortaDeCuidado({ produto, destaque }: { produto: Produto; destaque?: boolean }) {
-  return <button className={`porta-de-cuidado ${destaque ? 'porta-de-cuidado--destaque' : ''}`} type="button"><h2>{produto.titulo}</h2><p>{produto.descricao}</p></button>
+function LinhaDeServico({
+  id,
+  titulo,
+  descricao,
+  Icone,
+  onAbrir,
+}: {
+  id: ServicoId
+  titulo: string
+  descricao: string
+  Icone: typeof Footprints
+  onAbrir?: (servico: ServicoId) => void
+}) {
+  return (
+    <button className="linha-de-servico" type="button" onClick={() => onAbrir?.(id)}>
+      <span className="linha-de-servico__icone">
+        <Icone aria-hidden="true" size={24} />
+      </span>
+      <span className="linha-de-servico__texto">
+        <span className="linha-de-servico__titulo">{titulo}</span>
+        <span className="linha-de-servico__descricao">{descricao}</span>
+      </span>
+      <ChevronRight aria-hidden="true" size={22} />
+    </button>
+  )
 }
 
-function TrilhaDePortas({ itens }: { itens: Produto[] }) {
-  return <nav className="trilha-de-portas">{itens.map((produto, indice) => <PortaDeCuidado key={produto.id} produto={produto} destaque={indice === 0} />)}</nav>
+function ListaDeServicos({ onAbrirServico }: { onAbrirServico?: (servico: ServicoId) => void }) {
+  return (
+    <section className="lista-de-servicos" aria-labelledby="titulo-servicos">
+      <h2 id="titulo-servicos">Serviços</h2>
+      <div className="lista-de-servicos__itens">
+        {servicos.map(({ id, ...servico }) => (
+          <LinhaDeServico key={id} id={id} {...servico} onAbrir={onAbrirServico} />
+        ))}
+      </div>
+    </section>
+  )
 }
 
-function AcessoAoZelinho() {
-  return <button className="acesso-ao-zelinho" type="button" aria-label="Falar com o Zelinho">Falar com o Zelinho</button>
+function AtalhoZelinho({ onAbrir }: { onAbrir?: () => void }) {
+  return (
+    <button className="atalho-zelinho" type="button" onClick={onAbrir}>
+      <span className="atalho-zelinho__avatar" aria-hidden="true">Z</span>
+      <span>Dúvidas? Fale com o Zelinho</span>
+      <ChevronRight aria-hidden="true" size={22} />
+    </button>
+  )
 }
 
-export function PainelDoTutor() {
-  const tutorNome = 'Lucas'
-  const [estadoPet, setEstadoPet] = useState<EstadoPetAtivo>({ tipo: 'carregando' })
-  const [estadoAgendamento, setEstadoAgendamento] = useState<EstadoAgendamento>({ tipo: 'carregando' })
+export function BarraDeNavegacao({
+  telaAtiva,
+  onAbrirInicio,
+  onAbrirAgenda,
+  onAbrirZelinho,
+  onAbrirPerfil,
+}: {
+  telaAtiva: TelaPrincipal | null
+  onAbrirInicio?: () => void
+  onAbrirAgenda?: () => void
+  onAbrirZelinho?: () => void
+  onAbrirPerfil?: () => void
+}) {
+  return (
+    <nav className="barra-de-navegacao" aria-label="Principal">
+      <button
+        className={`barra-de-navegacao__item ${telaAtiva === 'inicio' ? 'barra-de-navegacao__item--ativo' : ''}`}
+        type="button"
+        onClick={onAbrirInicio}
+        aria-current={telaAtiva === 'inicio' ? 'page' : undefined}
+      >
+        <House aria-hidden="true" size={23} />
+        <span>Início</span>
+      </button>
+      <button
+        className={`barra-de-navegacao__item ${telaAtiva === 'agenda' ? 'barra-de-navegacao__item--ativo' : ''}`}
+        type="button"
+        onClick={onAbrirAgenda}
+        aria-current={telaAtiva === 'agenda' ? 'page' : undefined}
+      >
+        <CalendarDays aria-hidden="true" size={23} />
+        <span>Agenda</span>
+      </button>
+      <button
+        className={`barra-de-navegacao__item ${telaAtiva === 'zelinho' ? 'barra-de-navegacao__item--ativo' : ''}`}
+        type="button"
+        onClick={onAbrirZelinho}
+        aria-current={telaAtiva === 'zelinho' ? 'page' : undefined}
+      >
+        <MessageCircle aria-hidden="true" size={23} />
+        <span>Zelinho</span>
+      </button>
+      <button
+        className={`barra-de-navegacao__item ${telaAtiva === 'perfil' ? 'barra-de-navegacao__item--ativo' : ''}`}
+        type="button"
+        onClick={onAbrirPerfil}
+        aria-current={telaAtiva === 'perfil' ? 'page' : undefined}
+      >
+        <UserRound aria-hidden="true" size={23} />
+        <span>Perfil</span>
+      </button>
+    </nav>
+  )
+}
+
+export function PainelDoTutor({
+  onAbrirCarteira,
+  onAbrirPerfil,
+  onAbrirAgenda,
+  onAbrirZelinho,
+  onAbrirServico,
+  onCadastrarPet,
+  onSessaoExpirada,
+}: Props) {
+  const [tutor, setTutor] = useState<Tutor | null>(null)
+  const [estadoTutor, setEstadoTutor] = useState<EstadoRecurso>('carregando')
+  const [pets, setPets] = useState<Pet[]>([])
+  const [estadoPets, setEstadoPets] = useState<EstadoRecurso>('carregando')
+  const [petAtivoId, setPetAtivoId] = useState<string | null>(() => localStorage.getItem(CHAVE_PET_ATIVO))
+  const [cuidado, setCuidado] = useState<Cuidado | null>(null)
+  const [estadoCuidado, setEstadoCuidado] = useState<EstadoRecurso>('carregando')
 
   useEffect(() => {
     const token = obterToken()
     if (!token) {
-      setEstadoPet({ tipo: 'erro' })
+      onSessaoExpirada?.()
       return
     }
 
+    let ativo = true
+    obterTutor(token)
+      .then((dado) => {
+        if (!ativo) return
+        setTutor(dado)
+        setEstadoTutor('ok')
+      })
+      .catch((erro: unknown) => {
+        if (!ativo) return
+        if (isSessaoExpirada(erro)) {
+          onSessaoExpirada?.()
+          return
+        }
+        setEstadoTutor('erro')
+      })
+
     api
       .get<Pet[]>('/pets', token)
-      .then((pets) => setEstadoPet(pets.length === 0 ? { tipo: 'sem-pet' } : { tipo: 'ok', pet: pets[0] }))
-      .catch(() => setEstadoPet({ tipo: 'erro' }))
-  }, [])
+      .then((dado) => {
+        if (!ativo) return
+        setPets(dado)
+        setEstadoPets('ok')
+      })
+      .catch((erro: unknown) => {
+        if (!ativo) return
+        if (isSessaoExpirada(erro)) {
+          onSessaoExpirada?.()
+          return
+        }
+        setEstadoPets('erro')
+      })
+
+    obterProximoCuidado(token)
+      .then((resposta) => {
+        if (!ativo) return
+        setCuidado(resposta.proximo)
+        setEstadoCuidado('ok')
+      })
+      .catch((erro: unknown) => {
+        if (!ativo) return
+        if (isSessaoExpirada(erro)) {
+          onSessaoExpirada?.()
+          return
+        }
+        setEstadoCuidado('erro')
+      })
+
+    return () => {
+      ativo = false
+    }
+  }, [onSessaoExpirada])
 
   useEffect(() => {
-    // Ainda simulado: não existe endpoint de agendamentos nesta etapa.
-    // simulação da chamada à API — troca pelo fetch real na etapa de integração
-    const tempo = setTimeout(() => {
-      setEstadoAgendamento({ tipo: 'vazio' })
-    }, 600)
-    return () => clearTimeout(tempo)
-  }, [])
+    if (estadoPets !== 'ok') return
 
-  return <main className="painel-do-tutor"><SaudacaoDoZelo tutorNome={tutorNome} estadoPet={estadoPet} /><FaixaDeAgendamento estado={estadoAgendamento} /><TrilhaDePortas itens={produtos} /><AcessoAoZelinho /></main>
+    const petSelecionado = pets.find((pet) => pet.id === petAtivoId)
+    const idValido = petSelecionado?.id ?? pets[0]?.id ?? null
+    if (idValido !== petAtivoId) {
+      setPetAtivoId(idValido)
+    }
+    if (idValido) {
+      localStorage.setItem(CHAVE_PET_ATIVO, idValido)
+    } else {
+      localStorage.removeItem(CHAVE_PET_ATIVO)
+    }
+  }, [estadoPets, pets, petAtivoId])
+
+  function selecionarPet(petId: string) {
+    setPetAtivoId(petId)
+    localStorage.setItem(CHAVE_PET_ATIVO, petId)
+  }
+
+  return (
+    <div className="home-do-tutor">
+      <CabecalhoZelo
+        tutor={tutor}
+        estadoTutor={estadoTutor}
+        onAbrirCarteira={onAbrirCarteira}
+        onAbrirPerfil={onAbrirPerfil}
+      />
+      <main className="conteudo-home">
+        <SaudacaoComPet
+          tutor={tutor}
+          estadoTutor={estadoTutor}
+          pets={pets}
+          estadoPets={estadoPets}
+          petAtivoId={petAtivoId}
+          onSelecionarPet={selecionarPet}
+          onCadastrarPet={onCadastrarPet}
+        />
+        <CartaoProximoCuidado cuidado={cuidado} estado={estadoCuidado} />
+        <ListaDeServicos onAbrirServico={onAbrirServico} />
+        <AtalhoZelinho onAbrir={onAbrirZelinho} />
+      </main>
+      <BarraDeNavegacao
+        telaAtiva="inicio"
+        onAbrirAgenda={onAbrirAgenda}
+        onAbrirZelinho={onAbrirZelinho}
+        onAbrirPerfil={onAbrirPerfil}
+      />
+    </div>
+  )
 }

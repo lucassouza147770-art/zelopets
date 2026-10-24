@@ -4,7 +4,7 @@ import { salvarToken } from './api/auth'
 
 type EstadoEnvio = 'ocioso' | 'enviando' | 'erro'
 
-export function TelaLogin() {
+export function TelaLogin({ onAutenticado }: { onAutenticado: () => void }) {
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
@@ -20,6 +20,7 @@ export function TelaLogin() {
       const corpo = modo === 'login' ? { email, senha } : { nome, email, senha }
       const resposta = await api.post<{ accessToken: string }>(rota, corpo)
       salvarToken(resposta.accessToken)
+      onAutenticado()
       setEstado('ocioso')
     } catch (erro) {
       setEstado('erro')
