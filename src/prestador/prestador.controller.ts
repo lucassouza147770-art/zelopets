@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { TipoPrestador } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreatePrestadorDto } from './dto/create-prestador.dto';
@@ -30,18 +31,21 @@ export class PrestadorController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   criar(@Body() dto: CreatePrestadorDto) {
     return this.prestadorService.criar(dto);
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   atualizar(@Param('id') id: string, @Body() dto: UpdatePrestadorDto) {
     return this.prestadorService.atualizar(id, dto);
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   remover(@Param('id') id: string) {
     return this.prestadorService.remover(id);

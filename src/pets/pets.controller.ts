@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { PetsService } from './pets.service';
 
 @Controller('pets')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class PetsController {
   constructor(private readonly petsService: PetsService) {}

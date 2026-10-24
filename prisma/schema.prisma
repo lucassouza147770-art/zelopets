@@ -86,6 +86,7 @@ model Tutor {
   email     String   @unique
   senhaHash String
   telefone  String?
+  zeloCoins Int      @default(0)
   criadoEm  DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 

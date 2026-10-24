@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Tutor" ADD COLUMN     "zeloCoins" INTEGER NOT NULL DEFAULT 0;
