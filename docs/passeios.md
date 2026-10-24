@@ -21,12 +21,19 @@ Envie `Authorization: Bearer <token>` e um corpo como:
 {
   "petId": "<id-do-pet-do-tutor>",
   "dataHora": "2030-06-15T14:00:00.000Z",
-  "duracaoMinutos": 45,
-  "valor": 35.5
+  "duracaoMinutos": 45
 }
 ```
 
-`petId`, `dataHora` e `valor` são obrigatórios. `prestadorId` e `duracaoMinutos` são opcionais; a duração padrão é 30 minutos e, quando informada, deve ser de pelo menos 15 minutos. O valor deve ser maior ou igual a zero. `status` pode ser alterado via `PATCH` usando um valor de `StatusAgendamento`.
+`petId` e `dataHora` são obrigatórios. `prestadorId` e `duracaoMinutos` são
+opcionais; a duração padrão é 30 minutos. São aceitas somente durações de 30,
+45 ou 60 minutos, com preços calculados pelo servidor de R$ 25, R$ 35 e R$ 45,
+respectivamente. O corpo não aceita informar o preço.
+
+O `PATCH` permite alterar `prestadorId`, `dataHora`, `duracaoMinutos` e
+`status`, mas não permite trocar o `petId`. Ao alterar a duração, o servidor
+recalcula o preço. O tutor pode alterar o próprio `status`; regras de transição
+entre status ficam para uma etapa futura.
 
 ## Verificar o próximo passeio
 
@@ -35,3 +42,5 @@ Envie `Authorization: Bearer <token>` e um corpo como:
 3. Consulte `GET /passeios/proximo` com o mesmo token e confirme que a resposta contém o passeio criado.
 
 `/proximo` é registrada antes de `/:id` no controlador para que a rota estática não seja interpretada como um identificador.
+
+Onde estamos: Bloco 2 · Passo A de 6 concluído (commit pendente de autorização).

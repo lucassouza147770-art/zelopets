@@ -1,7 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePasseioDto } from './dto/create-passeio.dto';
 import { UpdatePasseioDto } from './dto/update-passeio.dto';
+
+const PRECO_POR_DURACAO: Record<30 | 45 | 60, number> = {
+  30: 25,
+  45: 35,
+  60: 45,
+};
 
 @Injectable()
 export class PasseioService {
@@ -16,14 +23,15 @@ export class PasseioService {
       throw new NotFoundException('Pet não encontrado para este tutor');
     }
 
+    const duracaoMinutos = dto.duracaoMinutos ?? 30;
     return this.prisma.passeio.create({
       data: {
         tutorId,
         petId: dto.petId,
         prestadorId: dto.prestadorId,
         dataHora: new Date(dto.dataHora),
-        duracaoMinutos: dto.duracaoMinutos ?? 30,
-        valor: dto.valor,
+        duracaoMinutos,
+        valor: PRECO_POR_DURACAO[duracaoMinutos],
       },
     });
   }
@@ -63,12 +71,19 @@ export class PasseioService {
 
   async atualizar(tutorId: string, id: string, dto: UpdatePasseioDto) {
     await this.buscarUm(tutorId, id);
+    const data: Prisma.PasseioUncheckedUpdateInput = {};
+
+    if (dto.prestadorId !== undefined) data.prestadorId = dto.prestadorId;
+    if (dto.dataHora !== undefined) data.dataHora = new Date(dto.dataHora);
+    if (dto.duracaoMinutos !== undefined) {
+      data.duracaoMinutos = dto.duracaoMinutos;
+      data.valor = PRECO_POR_DURACAO[dto.duracaoMinutos];
+    }
+    if (dto.status !== undefined) data.status = dto.status;
+
     return this.prisma.passeio.update({
       where: { id },
-      data: {
-        ...dto,
-        dataHora: dto.dataHora ? new Date(dto.dataHora) : undefined,
-      },
+      data,
     });
   }
 

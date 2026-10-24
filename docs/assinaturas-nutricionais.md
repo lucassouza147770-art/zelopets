@@ -35,13 +35,18 @@ informados. A criação verifica que o pet pertence ao tutor e que o plano
 existe; o ID do plano é validado antes de criar a assinatura.
 
 As respostas de consulta incluem os dados relacionados do pet e do plano. O
-`PATCH` aceita parcialmente os campos de criação e um `status` de
-`StatusAssinatura` (`ATIVA`, `PAUSADA` ou `CANCELADA`). O cancelamento é lógico:
-o registro permanece armazenado.
+`PATCH` aceita parcialmente `planoId`, `quantidadeRacaoKg`,
+`consumoDiarioEstimadoG` e um `status` de `StatusAssinatura` (`ATIVA`,
+`PAUSADA` ou `CANCELADA`); o `petId` não pode ser alterado. Ao mudar a
+quantidade ou o consumo diário, o servidor recalcula a previsão da próxima
+entrega. O cancelamento é lógico: o registro permanece armazenado.
+
+O tutor pode alterar o próprio `status`; regras de transição entre status
+ficam para uma etapa futura.
 
 ## Autorização
 
 Envie `Authorization: Bearer <accessToken>` em todas as rotas. A busca,
 atualização e exclusão são limitadas ao tutor do token.
 
-Onde estamos: checkpoint CRUDs + Swagger + seed (commit pendente de autorização).
+Onde estamos: Bloco 2 · Passo A de 6 concluído (commit pendente de autorização).

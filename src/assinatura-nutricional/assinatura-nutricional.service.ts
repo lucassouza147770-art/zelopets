@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAssinaturaDto } from './dto/create-assinatura.dto';
 import { UpdateAssinaturaDto } from './dto/update-assinatura.dto';
@@ -61,12 +62,6 @@ export class AssinaturaNutricionalService {
 
   async atualizar(tutorId: string, id: string, dto: UpdateAssinaturaDto) {
     const atual = await this.buscarUm(tutorId, id);
-    if (dto.petId) {
-      const pet = await this.prisma.pet.findFirst({ where: { id: dto.petId, tutorId } });
-      if (!pet) {
-        throw new NotFoundException('Pet não encontrado para este tutor');
-      }
-    }
     if (dto.planoId) {
       const plano = await this.prisma.planoNutricional.findUnique({ where: { id: dto.planoId } });
       if (!plano) {
@@ -76,12 +71,24 @@ export class AssinaturaNutricionalService {
 
     const quantidade = dto.quantidadeRacaoKg ?? atual.quantidadeRacaoKg;
     const consumo = dto.consumoDiarioEstimadoG ?? atual.consumoDiarioEstimadoG;
+    const data: Prisma.AssinaturaNutricionalUncheckedUpdateInput = {};
+
+    if (dto.planoId !== undefined) data.planoId = dto.planoId;
+    if (dto.quantidadeRacaoKg !== undefined) data.quantidadeRacaoKg = dto.quantidadeRacaoKg;
+    if (dto.consumoDiarioEstimadoG !== undefined) {
+      data.consumoDiarioEstimadoG = dto.consumoDiarioEstimadoG;
+    }
+    if (dto.status !== undefined) data.status = dto.status;
+    if (
+      dto.quantidadeRacaoKg !== undefined ||
+      dto.consumoDiarioEstimadoG !== undefined
+    ) {
+      data.previsaoProximaEntrega = calcularPrevisaoProximaEntrega(quantidade, consumo);
+    }
+
     return this.prisma.assinaturaNutricional.update({
       where: { id },
-      data: {
-        ...dto,
-        previsaoProximaEntrega: calcularPrevisaoProximaEntrega(quantidade, consumo),
-      },
+      data,
     });
   }
 

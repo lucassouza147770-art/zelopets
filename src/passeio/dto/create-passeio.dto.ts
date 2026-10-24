@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsDateString, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePasseioDto {
   @ApiProperty({ description: 'ID de um pet retornado por GET /pets', example: 'id-do-pet' })
@@ -16,16 +16,8 @@ export class CreatePasseioDto {
   @IsDateString()
   dataHora: string;
 
-  @ApiPropertyOptional({ minimum: 15, example: 30 })
+  @ApiPropertyOptional({ enum: [30, 45, 60], default: 30, example: 45 })
   @IsOptional()
-  @IsInt()
-  @Min(15)
-  duracaoMinutos?: number;
-
-  // preço fixo/simulado por enquanto — cálculo dinâmico de preço fica
-  // pra uma etapa futura, quando existir uma regra de precificação
-  @ApiProperty({ minimum: 0, example: 45 })
-  @IsNumber()
-  @Min(0)
-  valor: number;
+  @IsIn([30, 45, 60])
+  duracaoMinutos?: 30 | 45 | 60;
 }
