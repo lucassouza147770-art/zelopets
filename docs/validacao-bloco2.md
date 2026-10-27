@@ -149,3 +149,12 @@ fora do escopo.
 
 Onde estamos: Bloco 2 · Passo F de 6 concluido para o escopo do agente;
 Lighthouse Snapshot e confirmacao final por teclado ficam com o dono.
+
+## Correções aplicadas após o Passo F
+
+- O `PATCH` genérico de passeio, hospedagem e assinatura não aceita mais
+  `status`; mudanças de estado passam por operações de domínio, como
+  cancelamento, para impedir que o cliente falsifique o estado.
+- O CORS da API é limitado por `CORS_ORIGINS`, com origens locais como padrão
+  de desenvolvimento. Em publicação, configure explicitamente as origens
+  permitidas.

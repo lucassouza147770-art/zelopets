@@ -76,7 +76,7 @@ describe('HospedagemService', () => {
     expect(prisma.pacoteHospedagem.findUnique).not.toHaveBeenCalled();
   });
 
-  it('não permite trocar o pet nem recalcula preço numa alteração de status', async () => {
+  it('não permite trocar o pet nem alterar status pelo update genérico', async () => {
     prisma.hospedagem.findFirst.mockResolvedValue({
       id: 'stay-1',
       tutorId: 'tutor-1',
@@ -87,7 +87,6 @@ describe('HospedagemService', () => {
     });
     prisma.hospedagem.update.mockResolvedValue({});
     const dto = Object.assign(new UpdateHospedagemDto(), {
-      status: 'CONFIRMADO',
       petId: 'pet-de-outro-tutor',
     });
 
@@ -95,7 +94,7 @@ describe('HospedagemService', () => {
 
     expect(prisma.hospedagem.update).toHaveBeenCalledWith({
       where: { id: 'stay-1' },
-      data: { status: 'CONFIRMADO' },
+      data: {},
     });
     expect(prisma.pacoteHospedagem.findUnique).not.toHaveBeenCalled();
   });

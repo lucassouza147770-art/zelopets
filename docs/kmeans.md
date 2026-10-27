@@ -6,7 +6,7 @@ O microsservico fica em `ml-service/`:
 
 - `app/features.py`: transforma os pets em features numericas.
 - `app/train.py`: carrega dados, treina o K-Means e gera os entregaveis.
-- `app/main.py`: expoe `/health` e reserva `/recommend/{user_id}`.
+- `app/main.py`: expõe `/health` e `/recommend/{user_id}`.
 - `notebooks/justificativa_k.ipynb`: registra a justificativa metodologica.
 
 ## Features
@@ -62,4 +62,5 @@ Silhouette foi `0,533` em `K=8`; `K=4` ficou em `0,512`. Os dados sinteticos
 foram definidos em quatro perfis, por isso K=8 descreve subdivisoes desta
 amostra e nao uma descoberta de oito segmentos reais.
 
-Link para o e-mail de aprovacao do professor: **inserir aqui o link compartilhado pela equipe**.
+Não há link externo de aprovação registrado neste repositório; a justificativa
+metodológica está documentada neste arquivo e no notebook versionado.

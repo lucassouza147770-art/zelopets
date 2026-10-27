@@ -79,8 +79,6 @@ export class PasseioService {
       data.duracaoMinutos = dto.duracaoMinutos;
       data.valor = PRECO_POR_DURACAO[dto.duracaoMinutos];
     }
-    if (dto.status !== undefined) data.status = dto.status;
-
     return this.prisma.passeio.update({
       where: { id },
       data,

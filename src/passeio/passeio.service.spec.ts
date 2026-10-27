@@ -101,6 +101,6 @@ describe('PasseioService', () => {
       { ...metadata, metatype: UpdatePasseioDto },
     );
     expect(updateDto).not.toHaveProperty('petId');
-    expect(updateDto).toHaveProperty('status', 'CONFIRMADO');
+    expect(updateDto).not.toHaveProperty('status');
   });
 });

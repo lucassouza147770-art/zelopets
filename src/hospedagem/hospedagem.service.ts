@@ -73,8 +73,6 @@ export class HospedagemService {
     if (dto.pacoteId !== undefined) data.pacoteId = dto.pacoteId;
     if (dto.dataCheckin !== undefined) data.dataCheckin = checkin;
     if (dto.dataCheckout !== undefined) data.dataCheckout = checkout;
-    if (dto.status !== undefined) data.status = dto.status;
-
     if (recalcularValor) {
       const diarias = Math.ceil((checkout.getTime() - checkin.getTime()) / 86400000);
       if (diarias <= 0) {

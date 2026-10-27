@@ -2,6 +2,7 @@
 
 import hmac
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import joblib
@@ -13,12 +14,10 @@ from features import interpretar_centroide, montar_matriz, pets_para_dataframe
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
-app = FastAPI(title="ZeloPets - Recomendacao (K-Means)")
 MODELO_PATH = Path(__file__).resolve().parent / "modelo_kmeans.joblib"
 _modelo = None
 
 
-@app.on_event("startup")
 def carregar_modelo() -> None:
     global _modelo
     try:
@@ -32,6 +31,15 @@ def carregar_modelo() -> None:
         _modelo = modelo
     except FileNotFoundError:
         _modelo = None
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    carregar_modelo()
+    yield
+
+
+app = FastAPI(title="ZeloPets - Recomendacao (K-Means)", lifespan=lifespan)
 
 
 @app.get("/health")

@@ -1,13 +1,6 @@
-import { ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
-import { StatusAgendamento } from '@prisma/client';
-import { IsEnum, IsOptional } from 'class-validator';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateHospedagemDto } from './create-hospedagem.dto';
 
 export class UpdateHospedagemDto extends PartialType(
   OmitType(CreateHospedagemDto, ['petId'] as const),
-) {
-  @ApiPropertyOptional({ enum: StatusAgendamento })
-  @IsOptional()
-  @IsEnum(StatusAgendamento)
-  status?: StatusAgendamento;
-}
+) {}

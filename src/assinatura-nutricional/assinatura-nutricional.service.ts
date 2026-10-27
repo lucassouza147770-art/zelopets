@@ -78,7 +78,6 @@ export class AssinaturaNutricionalService {
     if (dto.consumoDiarioEstimadoG !== undefined) {
       data.consumoDiarioEstimadoG = dto.consumoDiarioEstimadoG;
     }
-    if (dto.status !== undefined) data.status = dto.status;
     if (
       dto.quantidadeRacaoKg !== undefined ||
       dto.consumoDiarioEstimadoG !== undefined

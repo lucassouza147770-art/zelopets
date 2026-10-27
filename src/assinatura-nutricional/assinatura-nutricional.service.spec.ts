@@ -36,7 +36,6 @@ describe('AssinaturaNutricionalService', () => {
     });
     prisma.assinaturaNutricional.update.mockResolvedValue({});
     const dto = Object.assign(new UpdateAssinaturaDto(), {
-      status: 'PAUSADA',
       petId: 'pet-de-outro-tutor',
     });
 
@@ -44,7 +43,7 @@ describe('AssinaturaNutricionalService', () => {
 
     expect(prisma.assinaturaNutricional.update).toHaveBeenCalledWith({
       where: { id: 'subscription-1' },
-      data: { status: 'PAUSADA' },
+      data: {},
     });
   });
 });
