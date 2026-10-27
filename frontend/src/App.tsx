@@ -7,6 +7,7 @@ import type { Cuidado } from './api/agenda'
 import { TelaCadastroDoPet } from './TelaCadastroDoPet'
 import { TelaLogin } from './TelaLogin'
 import { obterTutor, type Tutor } from './api/tutor'
+import { TelaMobilidade } from './Mobilidade'
 
 type EstadoSessao = 'verificando' | 'deslogado' | 'cadastro-pet' | 'autenticado' | 'erro'
 type Rota = TelaPrincipal | 'carteira' | 'servico'
@@ -28,7 +29,7 @@ function TelaInterna({
   children: ReactNode
 }) {
   return (
-    <main className="tela-interna">
+    <main className="tela-interna" tabIndex={-1}>
       <button className="botao-voltar" type="button" onClick={onVoltar}>
         <ArrowLeft aria-hidden="true" size={20} />
         Voltar
@@ -248,6 +249,11 @@ export function App() {
     void verificarSessao()
   }, [verificarSessao])
 
+  useEffect(() => {
+    if (estadoSessao !== 'autenticado') return
+    document.querySelector<HTMLElement>('.aplicacao-autenticada main')?.focus()
+  }, [estadoSessao, rota])
+
   function navegar(tela: TelaPrincipal) {
     setRota(tela)
   }
@@ -330,6 +336,13 @@ export function App() {
         <TelaInterna titulo="Zelinho" onVoltar={() => navegar('inicio')}>
           <p>Atendimento do Zelinho em construção.</p>
         </TelaInterna>
+      ) : rota === 'servico' && servicoAtivo === 'mobilidade' ? (
+        <TelaMobilidade
+          token={token}
+          onSessaoExpirada={encerrarSessao}
+          onVoltar={() => navegar('inicio')}
+          onAbrirAgenda={() => navegar('agenda')}
+        />
       ) : (
         <TelaInterna titulo={`${nomesServico[servicoAtivo]} — em construção`} onVoltar={() => navegar('inicio')}>
           <p>Este serviço estará disponível em breve.</p>

@@ -516,3 +516,238 @@
     grid-template-columns: repeat(6, 1fr);
   }
 }
+
+.tela-mobilidade {
+  box-sizing: border-box;
+  width: min(100%, 480px);
+  margin-inline: auto;
+}
+
+.tela-mobilidade h2 {
+  margin: 0;
+  font-family: var(--fonte-corpo);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.vitrine-recomendados,
+.formulario-agendamento {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lista-prestadores-recomendados {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao-prestador-recomendado {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.625rem;
+  border: 1px solid #D8E0DA;
+  border-radius: 1rem;
+  padding: 0.875rem;
+  background: #fff;
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cartao-prestador-recomendado--selecionado {
+  border-color: var(--cor-dominante);
+  background: var(--cor-menta-clara);
+}
+
+.cartao-prestador-recomendado__topo,
+.cartao-prestador-recomendado__nota,
+.cartao-prestador-recomendado__experiencia,
+.cartao-prestador-recomendado__motivo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cartao-prestador-recomendado__topo {
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cartao-prestador-recomendado__nota {
+  flex: 0 0 auto;
+  color: #7A4B00;
+  font-weight: 600;
+}
+
+.cartao-prestador-recomendado__experiencia {
+  color: var(--cor-texto-suave);
+  font-size: var(--tamanho-corpo-sm);
+}
+
+.cartao-prestador-recomendado__motivo {
+  min-height: 32px;
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  background: var(--cor-menta-clara);
+  color: var(--cor-dominante-escura);
+  font-size: var(--tamanho-corpo-sm);
+  font-weight: 600;
+}
+
+.esqueleto-recomendacoes {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.esqueleto-recomendacoes span {
+  min-height: 112px;
+  border-radius: 1rem;
+  background: var(--cor-superficie);
+}
+
+.formulario-agendamento form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formulario-agendamento__pet,
+.formulario-agendamento__prestador,
+.nota-preco-passeio,
+.valor-passeio {
+  margin: 0;
+}
+
+.campo-mobilidade {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-weight: 600;
+}
+
+.campo-mobilidade__controle {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #87958B;
+  border-radius: 0.75rem;
+  padding: 0 0.75rem;
+  background: #fff;
+}
+
+.campo-mobilidade__controle input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+}
+
+.seletor-duracao {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.seletor-duracao legend {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.seletor-duracao__opcoes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.seletor-duracao__opcoes button {
+  padding: 0.5rem;
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #87958B;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+
+.seletor-duracao__opcoes .seletor-duracao__opcao--selecionada {
+  border-color: var(--cor-dominante) !important;
+  background: var(--cor-menta-clara) !important;
+  color: var(--cor-dominante-escura);
+  font-weight: 600;
+}
+
+.valor-passeio {
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: var(--cor-acento-suave);
+}
+
+.botao-agendar-passeio {
+  min-height: 48px;
+  border: 0;
+  border-radius: 0.875rem;
+  padding: 0.625rem 1rem;
+  background: var(--cor-acento);
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mensagem-de-sucesso {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-radius: 0.875rem;
+  padding: 0.875rem;
+  background: var(--cor-menta-clara);
+  color: var(--cor-dominante-escura);
+}
+
+.mensagem-de-sucesso p {
+  margin: 0;
+}
+
+.nota-preco-passeio {
+  color: var(--cor-texto-suave);
+  font-size: var(--tamanho-corpo-sm);
+}
+
+.tela-mobilidade input:focus-visible,
+.tela-mobilidade button:focus-visible {
+  outline: 3px solid var(--cor-acento);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .esqueleto-recomendacoes span {
+    animation: brilho-esqueleto 1.4s ease-in-out infinite alternate;
+  }
+
+  @keyframes brilho-esqueleto {
+    from { opacity: 0.55; }
+    to { opacity: 1; }
+  }
+}

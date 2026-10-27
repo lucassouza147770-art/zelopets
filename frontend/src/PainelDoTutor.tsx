@@ -38,7 +38,7 @@ type Props = {
   onSessaoExpirada?: () => void
 }
 
-const CHAVE_PET_ATIVO = 'zelopets:petAtivoId'
+export const CHAVE_PET_ATIVO = 'zelopets:petAtivoId'
 
 const servicos: {
   id: ServicoId
@@ -523,7 +523,7 @@ export function PainelDoTutor({
         onAbrirCarteira={onAbrirCarteira}
         onAbrirPerfil={onAbrirPerfil}
       />
-      <main className="conteudo-home">
+      <main className="conteudo-home" tabIndex={-1}>
         <SaudacaoComPet
           tutor={tutor}
           estadoTutor={estadoTutor}

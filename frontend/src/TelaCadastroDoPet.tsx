@@ -33,12 +33,45 @@ function EscolhaDeRetrato({ racaSelecionada, onSelecionarRaca, estadoFoto, onArq
 type Porte = 'PEQUENO' | 'MEDIO' | 'GRANDE'
 type NivelEnergia = 'BAIXO' | 'MEDIO' | 'ALTO'
 
+function dataLocalHoje() {
+  const hoje = new Date()
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0')
+  const dia = String(hoje.getDate()).padStart(2, '0')
+  return `${hoje.getFullYear()}-${mes}-${dia}`
+}
+
 function CamposEssenciais({ nome, porte, nivelEnergia, onMudarNome, onMudarPorte, onMudarNivelEnergia }: { nome: string; porte: Porte | null; nivelEnergia: NivelEnergia | null; onMudarNome: (valor: string) => void; onMudarPorte: (valor: Porte) => void; onMudarNivelEnergia: (valor: NivelEnergia) => void }) {
   return <section className="campos-essenciais"><label>Nome do pet<input value={nome} onChange={(e) => onMudarNome(e.target.value)} /></label><fieldset><legend>Porte</legend>{(['PEQUENO', 'MEDIO', 'GRANDE'] as Porte[]).map((opcao) => <button key={opcao} type="button" aria-pressed={porte === opcao} onClick={() => onMudarPorte(opcao)}>{opcao}</button>)}</fieldset><fieldset><legend>Nível de energia</legend>{(['BAIXO', 'MEDIO', 'ALTO'] as NivelEnergia[]).map((opcao) => <button key={opcao} type="button" aria-pressed={nivelEnergia === opcao} onClick={() => onMudarNivelEnergia(opcao)}>{opcao}</button>)}</fieldset></section>
 }
 
-function DetalhesOpcionais({ aberto, onAlternar }: { aberto: boolean; onAlternar: () => void }) {
-  return <section className="detalhes-opcionais"><button type="button" onClick={onAlternar}>{aberto ? 'Ocultar detalhes' : 'Adicionar mais detalhes (opcional)'}</button>{aberto && <div className="detalhes-opcionais__conteudo"><label>Raça específica<input type="text" /></label><label>Peso (kg)<input type="number" /></label><label>Restrições alimentares<input type="text" placeholder="ex: alergia a frango" /></label><label>Comportamento<input type="text" placeholder="ex: ansioso, sociável" /></label></div>}</section>
+function DetalhesOpcionais({
+  aberto,
+  onAlternar,
+  raca,
+  pesoKg,
+  dataNascimento,
+  restricoesAlimentares,
+  comportamento,
+  onMudarRaca,
+  onMudarPesoKg,
+  onMudarDataNascimento,
+  onMudarRestricoesAlimentares,
+  onMudarComportamento,
+}: {
+  aberto: boolean
+  onAlternar: () => void
+  raca: string
+  pesoKg: string
+  dataNascimento: string
+  restricoesAlimentares: string
+  comportamento: string
+  onMudarRaca: (valor: string) => void
+  onMudarPesoKg: (valor: string) => void
+  onMudarDataNascimento: (valor: string) => void
+  onMudarRestricoesAlimentares: (valor: string) => void
+  onMudarComportamento: (valor: string) => void
+}) {
+  return <section className="detalhes-opcionais"><button type="button" onClick={onAlternar}>{aberto ? 'Ocultar detalhes' : 'Adicionar mais detalhes (opcional)'}</button>{aberto && <div className="detalhes-opcionais__conteudo"><label>Raça, se souber<input type="text" value={raca} onChange={(e) => onMudarRaca(e.target.value)} /></label><label>Data de nascimento<input type="date" value={dataNascimento} max={dataLocalHoje()} onChange={(e) => onMudarDataNascimento(e.target.value)} /></label><label>Peso (kg)<input type="number" min="0" max="500" step="0.1" value={pesoKg} onChange={(e) => onMudarPesoKg(e.target.value)} /></label><label>Restrições alimentares<input type="text" value={restricoesAlimentares} onChange={(e) => onMudarRestricoesAlimentares(e.target.value)} placeholder="Ex.: alergia a frango, sem glúten" /></label><label>Comportamento<input type="text" value={comportamento} onChange={(e) => onMudarComportamento(e.target.value)} placeholder="Ex.: ansioso, sociável" /></label></div>}</section>
 }
 
 type EstadoEnvio = 'ocioso' | 'enviando' | 'erro' | 'sucesso'
@@ -59,9 +92,18 @@ export function TelaCadastroDoPet({
   const [nome, setNome] = useState('')
   const [porte, setPorte] = useState<Porte | null>(null)
   const [nivelEnergia, setNivelEnergia] = useState<NivelEnergia | null>(null)
+  const [raca, setRaca] = useState('')
+  const [pesoKg, setPesoKg] = useState('')
+  const [dataNascimento, setDataNascimento] = useState('')
+  const [restricoesAlimentares, setRestricoesAlimentares] = useState('')
+  const [comportamento, setComportamento] = useState('')
   const [detalhesAbertos, setDetalhesAbertos] = useState(false)
   const [estadoEnvio, setEstadoEnvio] = useState<EstadoEnvio>('ocioso')
   const camposObrigatoriosPreenchidos = Boolean(nome.trim() && porte && nivelEnergia)
+
+  function separarLista(valor: string) {
+    return valor.split(',').map((item) => item.trim()).filter(Boolean)
+  }
 
   function handleArquivoSelecionado(arquivo: File) {
     if (arquivo.size > 5 * 1024 * 1024) {
@@ -83,13 +125,27 @@ export function TelaCadastroDoPet({
         onSessaoExpirada()
         return
       }
-      await api.post('/pets', { nome, porte, nivelEnergia }, token)
+      await api.post('/pets', {
+        nome: nome.trim(),
+        porte,
+        nivelEnergia,
+        raca: raca.trim() || undefined,
+        pesoKg: pesoKg.trim() ? Number(pesoKg) : undefined,
+        dataNascimento: dataNascimento || undefined,
+        restricoesAlimentares: separarLista(restricoesAlimentares),
+        comportamento: separarLista(comportamento),
+      }, token)
       setEstadoEnvio('sucesso')
       onPetCriado()
       setNome('')
       setPorte(null)
       setNivelEnergia(null)
       setRacaSelecionada(null)
+      setRaca('')
+      setPesoKg('')
+      setDataNascimento('')
+      setRestricoesAlimentares('')
+      setComportamento('')
       setEstadoFoto({ tipo: 'ociosa' })
     } catch (erro) {
       setEstadoEnvio('erro')
@@ -99,5 +155,5 @@ export function TelaCadastroDoPet({
     }
   }
 
-  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} />{estadoEnvio === 'sucesso' && <p className="botao-criar-gemeo-digital__sucesso">Perfil criado.</p>}</main>
+  return <main className="tela-cadastro-do-pet"><h1>Cadastro do pet</h1><EscolhaDeRetrato racaSelecionada={racaSelecionada} onSelecionarRaca={setRacaSelecionada} estadoFoto={estadoFoto} onArquivoSelecionado={handleArquivoSelecionado} /><CamposEssenciais nome={nome} porte={porte} nivelEnergia={nivelEnergia} onMudarNome={setNome} onMudarPorte={setPorte} onMudarNivelEnergia={setNivelEnergia} /><DetalhesOpcionais aberto={detalhesAbertos} onAlternar={() => setDetalhesAbertos((valor) => !valor)} raca={raca} pesoKg={pesoKg} dataNascimento={dataNascimento} restricoesAlimentares={restricoesAlimentares} comportamento={comportamento} onMudarRaca={setRaca} onMudarPesoKg={setPesoKg} onMudarDataNascimento={setDataNascimento} onMudarRestricoesAlimentares={setRestricoesAlimentares} onMudarComportamento={setComportamento} /><BotaoCriarGemeoDigital nomePet={nome} habilitado={camposObrigatoriosPreenchidos} estado={estadoEnvio} onClick={handleCriarGemeoDigital} />{estadoEnvio === 'sucesso' && <p className="botao-criar-gemeo-digital__sucesso">Perfil criado.</p>}</main>
 }
