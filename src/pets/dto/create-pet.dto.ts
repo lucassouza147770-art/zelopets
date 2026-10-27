@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { NivelEnergia, Porte } from '@prisma/client';
 
 export class CreatePetDto {
@@ -14,6 +14,10 @@ export class CreatePetDto {
   @IsOptional()
   @IsString()
   raca?: string;
+
+  @IsOptional()
+  @IsDateString()
+  dataNascimento?: string;
 
   @IsOptional()
   @IsNumber()

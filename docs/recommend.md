@@ -13,9 +13,22 @@ O treinamento lê pets do PostgreSQL. Com menos de 20 pets, usa dados simulados 
 
 ## Endpoint
 
-`GET /recommend/{user_id}`
+`GET /recommend/{user_id}?pet_id=<id-do-pet>`
 
-O `user_id` é o ID do tutor. O serviço busca os pets desse tutor, usa o primeiro (ordenado pela criação), aplica o mesmo `ColumnTransformer` e os mesmos `MultiLabelBinarizers` salvos no treino, prevê o cluster e decodifica porte, energia e raça representativos do centroide. Em seguida busca prestadores ativos, recomenda os que atendem ao porte **ou** ao nível de energia do perfil do cluster, ordena por `avaliacaoMedia` decrescente e retorna até cinco.
+O `user_id` é o ID do tutor. O parâmetro opcional `pet_id` seleciona um pet;
+o serviço verifica que ele pertence ao tutor e responde `404` quando não
+pertence. Sem `pet_id`, usa o primeiro pet do tutor, ordenado pela criação.
+Aplica o mesmo `ColumnTransformer` e os mesmos `MultiLabelBinarizers` salvos
+no treino, prevê o cluster e decodifica porte, energia e raça representativos
+do centroide. Em seguida busca prestadores ativos, recomenda os que atendem ao
+porte **ou** ao nível de energia do perfil do cluster, ordena por
+`avaliacaoMedia` decrescente e retorna até cinco.
+
+Todas as chamadas de `/recommend/{user_id}` exigem o cabeçalho
+`X-Internal-Token`, cujo valor deve corresponder a `ML_INTERNAL_TOKEN` no
+ambiente do serviço. A rota `/health` permanece pública. Se o token não estiver
+configurado, a recomendação responde `503`; token ausente ou inválido responde
+`401`. Nunca registre nem exponha o valor do token.
 
 Exemplo de resposta:
 
@@ -28,11 +41,26 @@ Exemplo de resposta:
     "nivel_energia": "ALTO",
     "raca": "Labrador"
   },
-  "prestadoresRecomendados": []
+  "prestadoresRecomendados": [
+    {
+      "id": "uuid-do-prestador",
+      "nome": "Nome do prestador",
+      "tipo": "PASSEADOR",
+      "avaliacaoMedia": 4.8,
+      "portesAtendidos": ["GRANDE"],
+      "niveisEnergiaAtendidos": ["ALTO"]
+    }
+  ],
+  "prestadoresRecomendadosIds": ["uuid-do-prestador"]
 }
 ```
 
-O endpoint responde `404` quando o tutor não tem pets e `503` quando o modelo está ausente ou foi treinado no formato antigo sem `binarizadores`; rode novamente o comando de treino após qualquer mudança na estrutura do artefato.
+`prestadoresRecomendadosIds` contém os IDs na mesma ordem dos objetos em
+`prestadoresRecomendados`; os campos de resposta existentes são mantidos para
+compatibilidade. O endpoint responde `404` quando o tutor não tem pets ou o
+pet selecionado não pertence a ele, e `503` quando o modelo está ausente ou foi
+treinado no formato antigo sem `binarizadores`; rode novamente o comando de
+treino após qualquer mudança na estrutura do artefato.
 
 ## Perfil dos prestadores
 
@@ -40,4 +68,10 @@ Crie prestadores com `portesAtendidos` e/ou `niveisEnergiaAtendidos` preenchidos
 
 ## Execução local
 
-Na pasta `ml-service/app`, inicie a API com `python -m uvicorn main:app --reload --port 8000`. `GET /health` informa se o modelo foi carregado. A raiz do projeto deve conter `.env` com a conexão ao banco.
+Na pasta `ml-service/app`, inicie a API com
+`python -m uvicorn main:app --reload --port 8000`. Configure
+`ML_INTERNAL_TOKEN` e `DATABASE_URL` no ambiente ou no `.env` da raiz; não
+inclua valores secretos em logs ou documentação. `GET /health` informa se o
+modelo foi carregado e não requer token.
+
+Onde estamos: Bloco 2 · Passo C de 6 concluído (commit pendente de autorização).

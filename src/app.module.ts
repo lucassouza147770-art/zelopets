@@ -11,6 +11,7 @@ import { AssinaturaNutricionalModule } from './assinatura-nutricional/assinatura
 import { CatalogoModule } from './catalogo/catalogo.module';
 import { TutorModule } from './tutor/tutor.module';
 import { AgendaModule } from './agenda/agenda.module';
+import { RecomendacaoModule } from './recomendacao/recomendacao.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AgendaModule } from './agenda/agenda.module';
     CatalogoModule,
     TutorModule,
     AgendaModule,
+    RecomendacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
