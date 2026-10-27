@@ -8,3 +8,5 @@ joblib
 matplotlib
 psycopg2-binary
 python-dotenv
+httpx
+pytest

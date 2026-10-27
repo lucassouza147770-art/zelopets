@@ -50,6 +50,19 @@ def buscar_pets_do_tutor(tutor_id: str) -> list[dict]:
     )
 
 
+def buscar_pet_do_tutor(tutor_id: str, pet_id: str) -> dict | None:
+    pets = _buscar(
+        '''
+        SELECT id, porte, "nivelEnergia", raca, "pesoKg",
+               "dataNascimento", "restricoesAlimentares", comportamento
+        FROM "Pet"
+        WHERE "tutorId" = %s AND id = %s
+        ''',
+        (tutor_id, pet_id),
+    )
+    return pets[0] if pets else None
+
+
 def buscar_prestadores_ativos() -> list[dict]:
     return _buscar(
         '''

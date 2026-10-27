@@ -20,7 +20,13 @@ por exemplo, criaria uma distancia artificial. O encoder tambem usa
 
 ### Variaveis numericas
 
-`pesoKg` e a idade calculada a partir de `dataNascimento` usam StandardScaler.
+`pesoKg` e a idade calculada a partir de `dataNascimento` usam imputacao
+mediana ajustada somente no conjunto de treino, seguida por StandardScaler.
+Ausencias permanecem como NaN ate a transformacao; nao sao convertidas em
+zero. O mesmo imputador salvo no modelo e aplicado durante a inferencia. Se
+uma feature numerica estiver totalmente ausente no treino, o treinamento falha
+com uma mensagem explicita em vez de inventar uma mediana.
+
 O K-Means usa distancia, entao a padronizacao impede que uma feature com
 unidade ou amplitude maior domine o agrupamento.
 
@@ -33,20 +39,27 @@ inadequada a indicadores 0/1.
 
 ## Treino
 
-`train.py` tenta ler os pets reais da tabela `Pet` usando `DATABASE_URL`. Com
-menos de 20 registros, usa um dataset deterministico simulado com seed 42,
-apenas para validar a pipeline. O modelo final deve ser regenerado com pets
-reais antes da entrega.
+`train.py` tenta ler os pets da tabela `Pet` usando `DATABASE_URL`. Com menos
+de 20 registros, usa um dataset deterministico simulado com seed 42, incluindo
+idades e pesos para validar o tratamento numerico. O artefato guarda a versao
+do pipeline de features; a API rejeita modelos anteriores a essa versao ate
+que o retreino seja feito.
 
 O treino calcula inercia e Silhouette Score para `K` de 2 a 10, salva
-`app/elbow_e_silhouette.png` e grava `app/modelo_kmeans.joblib` com o pipeline,
-o modelo e a fonte dos dados.
+`app/elbow_e_silhouette.png` e grava `app/modelo_kmeans.joblib` com o
+imputador, o restante do pipeline, o modelo e a fonte dos dados.
 
-## API e pendencias
+## API de recomendacao
 
 `GET /health` informa se o modelo foi carregado. O endpoint
-`GET /recommend/{user_id}` permanece `501 Not Implemented` porque a busca de
-prestadores proximos ao centroide depende da tabela `Prestador`, ainda nao
-criada no schema.
+`GET /recommend/{user_id}` exige o token interno e, opcionalmente, `pet_id`.
+Ao receber o identificador, confirma que o pet pertence ao tutor antes da
+inferencia; sem identificador, usa o primeiro pet desse tutor. O resultado
+inclui o cluster e os prestadores ativos compatíveis ordenados por avaliacao.
+
+Na reexecucao com 50 registros de demonstracao e preexistentes, a maior
+Silhouette foi `0,533` em `K=8`; `K=4` ficou em `0,512`. Os dados sinteticos
+foram definidos em quatro perfis, por isso K=8 descreve subdivisoes desta
+amostra e nao uma descoberta de oito segmentos reais.
 
 Link para o e-mail de aprovacao do professor: **inserir aqui o link compartilhado pela equipe**.

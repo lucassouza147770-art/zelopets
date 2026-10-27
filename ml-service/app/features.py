@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MultiLabelBinarizer, OneHotEncoder, StandardScaler
 
 COLUNAS_CATEGORICAS = ["porte", "nivel_energia", "raca"]
@@ -21,9 +23,13 @@ COLUNAS_NUMERICAS = ["peso_kg", "idade_anos"]
 COLUNAS_MULTI_LABEL = ["restricoes_alimentares", "comportamento"]
 
 
-def calcular_idade_anos(data_nascimento: date | datetime | None) -> float:
+def calcular_idade_anos(data_nascimento: date | datetime | str | None) -> float:
     if data_nascimento is None:
-        return 0.0
+        return float("nan")
+    if isinstance(data_nascimento, str):
+        data_nascimento = datetime.fromisoformat(
+            data_nascimento.replace("Z", "+00:00")
+        )
     nascimento = data_nascimento.date() if isinstance(data_nascimento, datetime) else data_nascimento
     return round((date.today() - nascimento).days / 365.25, 1)
 
@@ -38,7 +44,9 @@ def pets_para_dataframe(pets: list[dict[str, Any]]) -> pd.DataFrame:
                 "porte": pet.get("porte") or "DESCONHECIDO",
                 "nivel_energia": pet.get("nivelEnergia") or "DESCONHECIDO",
                 "raca": pet.get("raca") or "SRD",
-                "peso_kg": pet.get("pesoKg") or 0.0,
+                "peso_kg": (
+                    float(pet["pesoKg"]) if pet.get("pesoKg") is not None else np.nan
+                ),
                 "idade_anos": calcular_idade_anos(pet.get("dataNascimento")),
                 "restricoes_alimentares": pet.get("restricoesAlimentares") or [],
                 "comportamento": pet.get("comportamento") or [],
@@ -51,7 +59,16 @@ def montar_pipeline_features() -> ColumnTransformer:
     return ColumnTransformer(
         transformers=[
             ("categoricas", OneHotEncoder(handle_unknown="ignore"), COLUNAS_CATEGORICAS),
-            ("numericas", StandardScaler(), COLUNAS_NUMERICAS),
+            (
+                "numericas",
+                Pipeline(
+                    [
+                        ("imputador", SimpleImputer(strategy="median")),
+                        ("escalador", StandardScaler()),
+                    ]
+                ),
+                COLUNAS_NUMERICAS,
+            ),
         ],
         remainder="drop",
     )
@@ -88,6 +105,12 @@ def montar_matriz(
 ) -> np.ndarray:
     """Gera treino e inferência com o mesmo pipeline e as mesmas colunas."""
     if treinando:
+        sem_valores = [coluna for coluna in COLUNAS_NUMERICAS if df[coluna].notna().sum() == 0]
+        if sem_valores:
+            nomes = ", ".join(sem_valores)
+            raise ValueError(
+                f"Nao e possivel ajustar a mediana sem valores de treino em: {nomes}"
+            )
         matriz_principal = pipeline_features.fit_transform(df)
     else:
         matriz_principal = pipeline_features.transform(df)

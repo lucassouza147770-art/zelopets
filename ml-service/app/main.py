@@ -1,12 +1,17 @@
 """Microsservico de recomendacao do ZeloPets baseado em K-Means."""
 
+import hmac
+import os
 from pathlib import Path
 
 import joblib
-from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+from fastapi import FastAPI, Header, HTTPException
 
-from db import buscar_pets_do_tutor, buscar_prestadores_ativos
+from db import buscar_pet_do_tutor, buscar_pets_do_tutor, buscar_prestadores_ativos
 from features import interpretar_centroide, montar_matriz, pets_para_dataframe
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 app = FastAPI(title="ZeloPets - Recomendacao (K-Means)")
 MODELO_PATH = Path(__file__).resolve().parent / "modelo_kmeans.joblib"
@@ -18,7 +23,10 @@ def carregar_modelo() -> None:
     global _modelo
     try:
         modelo = joblib.load(MODELO_PATH)
-        if not {"pipeline_features", "binarizadores", "kmeans"}.issubset(modelo):
+        if (
+            modelo.get("versao_features") != 2
+            or not {"pipeline_features", "binarizadores", "kmeans"}.issubset(modelo)
+        ):
             _modelo = None
             return
         _modelo = modelo
@@ -32,18 +40,36 @@ def health() -> dict[str, bool | str]:
 
 
 @app.get("/recommend/{user_id}")
-def recomendar(user_id: str) -> dict:
+def recomendar(
+    user_id: str,
+    pet_id: str | None = None,
+    token_interno: str | None = Header(default=None, alias="X-Internal-Token"),
+) -> dict:
+    token_esperado = os.environ.get("ML_INTERNAL_TOKEN")
+    if not token_esperado:
+        raise HTTPException(
+            status_code=503,
+            detail="Token interno do servico nao configurado",
+        )
+    if token_interno is None or not hmac.compare_digest(token_interno, token_esperado):
+        raise HTTPException(status_code=401, detail="Token interno invalido")
+
     if _modelo is None:
         raise HTTPException(
             status_code=503,
             detail="Modelo ausente ou legado - instale requirements.txt e rode python train.py",
         )
 
-    pets = buscar_pets_do_tutor(user_id)
-    if not pets:
-        raise HTTPException(status_code=404, detail="Esse tutor ainda nao tem pets cadastrados")
+    if pet_id:
+        pet = buscar_pet_do_tutor(user_id, pet_id)
+        if pet is None:
+            raise HTTPException(status_code=404, detail="Pet nao encontrado para esse tutor")
+    else:
+        pets = buscar_pets_do_tutor(user_id)
+        if not pets:
+            raise HTTPException(status_code=404, detail="Esse tutor ainda nao tem pets cadastrados")
+        pet = pets[0]
 
-    pet = pets[0]
     df = pets_para_dataframe([pet])
     matriz = montar_matriz(
         df,
@@ -70,4 +96,5 @@ def recomendar(user_id: str) -> dict:
         "cluster": cluster,
         "perfilDoCluster": perfil_cluster,
         "prestadoresRecomendados": compativeis[:5],
+        "prestadoresRecomendadosIds": [prestador["id"] for prestador in compativeis[:5]],
     }

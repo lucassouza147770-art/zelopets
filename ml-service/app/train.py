@@ -11,12 +11,12 @@ controlado e usado somente para validar a pipeline mecanica.
 from __future__ import annotations
 
 import random
+from datetime import date, timedelta
 from pathlib import Path
 
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -45,7 +45,8 @@ def gerar_pets_simulados(quantidade: int = 60) -> list[dict]:
                 "nivelEnergia": aleatorio.choice(NIVEIS_ENERGIA),
                 "raca": aleatorio.choice(RACAS),
                 "pesoKg": round(aleatorio.uniform(2, 45), 1),
-                "dataNascimento": None,
+                "dataNascimento": date.today()
+                - timedelta(days=aleatorio.randint(30, 15 * 365)),
                 "restricoesAlimentares": aleatorio.sample(RESTRICOES_POSSIVEIS, k=aleatorio.randint(0, 1)),
                 "comportamento": aleatorio.sample(COMPORTAMENTOS_POSSIVEIS, k=aleatorio.randint(1, 2)),
             }
@@ -86,7 +87,10 @@ def main() -> None:
     try:
         pets = buscar_todos_os_pets()
     except Exception as erro:
-        print(f"Nao foi possivel ler o banco ({erro}) - usando dataset simulado.")
+        print(
+            "Nao foi possivel ler o banco "
+            f"({type(erro).__name__}) - usando dataset simulado."
+        )
         pets = []
 
     fonte = "banco real"
@@ -103,17 +107,27 @@ def main() -> None:
 
     modelo_final = KMeans(n_clusters=melhor_k, random_state=42, n_init=10)
     modelo_final.fit(matriz)
+    silhouette_final = silhouette_score(matriz, modelo_final.labels_)
+    contagem_clusters = np.bincount(modelo_final.labels_, minlength=melhor_k)
     joblib.dump(
         {
+            "versao_features": 2,
             "pipeline_features": pipeline_features,
             "binarizadores": binarizadores,
             "kmeans": modelo_final,
             "k_escolhido": melhor_k,
             "fonte_dos_dados": fonte,
+            "quantidade_pets": len(pets),
+            "silhouette_score": float(silhouette_final),
+            "contagem_clusters": contagem_clusters.tolist(),
         },
         MODELO_PATH,
     )
-    print(f"Modelo salvo em {MODELO_PATH} (fonte dos dados: {fonte})")
+    print(f"Fonte dos dados: {fonte}; pets: {len(pets)}; K escolhido: {melhor_k}")
+    print(f"Silhouette do modelo final: {silhouette_final:.3f}")
+    for indice, quantidade in enumerate(contagem_clusters):
+        print(f"Cluster {indice}: {quantidade} pets")
+    print(f"Modelo salvo em {MODELO_PATH}")
 
 
 if __name__ == "__main__":
