@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { ApiError, api } from './api/client'
 import { limparToken, obterToken } from './api/auth'
@@ -210,6 +210,58 @@ function TelaCarteira({
   )
 }
 
+function responderZelinho(pergunta: string) {
+  const texto = pergunta.toLocaleLowerCase('pt-BR')
+  if (texto.includes('agenda') || texto.includes('agendamento')) {
+    return 'Você pode consultar seus próximos cuidados na Agenda. Para criar um passeio, abra Mobilidade.'
+  }
+  if (texto.includes('moeda') || texto.includes('zelocoin') || texto.includes('saldo')) {
+    return 'Seu saldo de ZeloCoins fica na Carteira, acessível pelo botão no cabeçalho.'
+  }
+  if (texto.includes('hotel') || texto.includes('hosped')) {
+    return 'O Hotel ZeloPets está em preparação. Em breve você poderá escolher um pacote de hospedagem.'
+  }
+  if (texto.includes('nutri') || texto.includes('ração') || texto.includes('racao')) {
+    return 'A Nutrição funciona por assinatura e permite acompanhar a próxima entrega do seu cão.'
+  }
+  if (texto.includes('passeio') || texto.includes('mobilidade')) {
+    return 'Na Mobilidade você encontra passeadores compatíveis e pode solicitar um passeio.'
+  }
+  return 'Posso ajudar com agenda, passeio, hospedagem, nutrição ou ZeloCoins. O que você gostaria de saber?'
+}
+
+function TelaZelinho({ onVoltar }: { onVoltar: () => void }) {
+  const [pergunta, setPergunta] = useState('')
+  const [resposta, setResposta] = useState(
+    'Olá! Sou o Zelinho. Posso orientar sobre os serviços do ZeloPets.',
+  )
+
+  function enviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    const texto = pergunta.trim()
+    if (!texto) return
+    setResposta(responderZelinho(texto))
+    setPergunta('')
+  }
+
+  return (
+    <TelaInterna titulo="Zelinho" onVoltar={onVoltar}>
+      <p role="status">{resposta}</p>
+      <form className="formulario-zelinho" onSubmit={enviar}>
+        <label htmlFor="pergunta-zelinho">Sua dúvida</label>
+        <input
+          id="pergunta-zelinho"
+          value={pergunta}
+          onChange={(evento) => setPergunta(evento.target.value)}
+          placeholder="Ex.: onde vejo minha agenda?"
+        />
+        <button className="acao-secundaria" type="submit">Enviar pergunta</button>
+      </form>
+      <p className="texto-apoio">Motor local ativo. Integração LLM: aguardando chave.</p>
+    </TelaInterna>
+  )
+}
+
 export function App() {
   const [estadoSessao, setEstadoSessao] = useState<EstadoSessao>('verificando')
   const [mensagemErro, setMensagemErro] = useState<string | null>(null)
@@ -333,9 +385,7 @@ export function App() {
       ) : rota === 'carteira' ? (
         <TelaCarteira token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} />
       ) : rota === 'zelinho' ? (
-        <TelaInterna titulo="Zelinho" onVoltar={() => navegar('inicio')}>
-          <p>Atendimento do Zelinho em construção.</p>
-        </TelaInterna>
+        <TelaZelinho onVoltar={() => navegar('inicio')} />
       ) : rota === 'servico' && servicoAtivo === 'mobilidade' ? (
         <TelaMobilidade
           token={token}
@@ -348,6 +398,9 @@ export function App() {
           <p>Este serviço estará disponível em breve.</p>
         </TelaInterna>
       )}
+      <footer className="rodape-aplicacao">
+        <small>ZeloPets · cuidado que entende seu cão</small>
+      </footer>
       {rota !== 'inicio' && (
         <BarraDeNavegacao
           telaAtiva={telaAtiva}

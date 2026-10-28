@@ -46,4 +46,34 @@ describe('AssinaturaNutricionalService', () => {
       data: {},
     });
   });
+
+  it('pausa uma assinatura do tutor', async () => {
+    prisma.assinaturaNutricional.findFirst.mockResolvedValue({
+      id: 'subscription-1',
+      status: 'ATIVA',
+    });
+    prisma.assinaturaNutricional.update.mockResolvedValue({ status: 'PAUSADA' });
+
+    await service.pausar('tutor-1', 'subscription-1');
+
+    expect(prisma.assinaturaNutricional.update).toHaveBeenCalledWith({
+      where: { id: 'subscription-1' },
+      data: { status: 'PAUSADA' },
+    });
+  });
+
+  it('retoma uma assinatura pausada', async () => {
+    prisma.assinaturaNutricional.findFirst.mockResolvedValue({
+      id: 'subscription-1',
+      status: 'PAUSADA',
+    });
+    prisma.assinaturaNutricional.update.mockResolvedValue({ status: 'ATIVA' });
+
+    await service.retomar('tutor-1', 'subscription-1');
+
+    expect(prisma.assinaturaNutricional.update).toHaveBeenCalledWith({
+      where: { id: 'subscription-1' },
+      data: { status: 'ATIVA' },
+    });
+  });
 });

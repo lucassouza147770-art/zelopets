@@ -118,11 +118,14 @@ saldo de demonstração. As rotas de tutor e agenda requerem autenticação JWT.
 - **Mobilidade:** recomendações de passeadores para o cão ativo e formulário
   para agendar passeios.
 - **Agenda:** próximos cuidados do tutor.
-- **Zelinho:** tela provisória de atendimento.
+- **Zelinho:** classificador local de dúvidas sobre os serviços; integração LLM aguarda chave.
 - **Perfil:** dados do tutor e cães cadastrados.
 - **Carteira:** saldo atual de ZeloCoins; histórico e regras de acúmulo ainda
   estão em construção.
-- **Telas de serviço:** Hotel e Nutrição continuam como placeholders.
+- **Telas de serviço:** Hotel e Nutrição continuam como placeholders de interface.
+
+As limitações deliberadas de escopo estão em
+[`docs/limitacoes.md`](./docs/limitacoes.md).
 
 ## Verificações
 

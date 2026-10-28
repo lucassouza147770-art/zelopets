@@ -47,6 +47,21 @@ export class AssinaturaNutricionalController {
     return this.assinaturaService.atualizar(req.user.tutorId, id, dto);
   }
 
+  @Post(':id/pausar')
+  pausar(@Req() req: RequisicaoAutenticada, @Param('id') id: string) {
+    return this.assinaturaService.pausar(req.user.tutorId, id);
+  }
+
+  @Post(':id/retomar')
+  retomar(@Req() req: RequisicaoAutenticada, @Param('id') id: string) {
+    return this.assinaturaService.retomar(req.user.tutorId, id);
+  }
+
+  @Post(':id/cancelar')
+  cancelarPorOperacao(@Req() req: RequisicaoAutenticada, @Param('id') id: string) {
+    return this.assinaturaService.cancelar(req.user.tutorId, id);
+  }
+
   @Delete(':id')
   cancelar(@Req() req: RequisicaoAutenticada, @Param('id') id: string) {
     return this.assinaturaService.cancelar(req.user.tutorId, id);

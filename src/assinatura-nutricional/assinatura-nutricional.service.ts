@@ -98,4 +98,28 @@ export class AssinaturaNutricionalService {
       data: { status: 'CANCELADA' },
     });
   }
+
+  async pausar(tutorId: string, id: string) {
+    const assinatura = await this.buscarUm(tutorId, id);
+    if (assinatura.status === 'CANCELADA') {
+      throw new NotFoundException('Assinatura cancelada não pode ser pausada');
+    }
+
+    return this.prisma.assinaturaNutricional.update({
+      where: { id },
+      data: { status: 'PAUSADA' },
+    });
+  }
+
+  async retomar(tutorId: string, id: string) {
+    const assinatura = await this.buscarUm(tutorId, id);
+    if (assinatura.status === 'CANCELADA') {
+      throw new NotFoundException('Assinatura cancelada não pode ser retomada');
+    }
+
+    return this.prisma.assinaturaNutricional.update({
+      where: { id },
+      data: { status: 'ATIVA' },
+    });
+  }
 }

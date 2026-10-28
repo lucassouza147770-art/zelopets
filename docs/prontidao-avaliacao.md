@@ -14,13 +14,16 @@ concluída na demonstração.
 | Inicialização do ML | Modelo carregado no lifespan do FastAPI; modelo ausente aparece no health | Atendido |
 | Justificativa de K | Notebook com K=2..10, perfis decodificados e conclusão honesta | Atendido |
 | Recomendações integradas | Nest valida o pet, aplica timeout e chama `/recommend` | Atendido |
+| Assinaturas com ciclo controlado | Rotas próprias de pausar, retomar e cancelar com ownership | Atendido nesta rodada |
 | Home, Mobilidade e cadastro completo do pet | React, fluxo manual e builds verificados | Atendido |
+| Zelinho local | Classificador determinístico de intenções para dúvidas de serviços | Atendido nesta rodada |
+| Estrutura semântica | Header, nav, main, section e footer na aplicação autenticada | Atendido nesta rodada |
 | Axe em Home e Mobilidade | 0 violações registradas em `docs/validacao-bloco2.md` | Atendido nessas duas telas |
 | Lighthouse Snapshot autenticado | Não foi possível obter relatório local | Pendente do dono |
 | Fluxo completo somente por teclado | Foco e duração verificados; `datetime-local` não permitiu confirmar envio | Pendente do dono |
 | Área administrativa e papéis | Não existe módulo/guard administrativo | Pendente |
 | Filtros e ordenação de vitrine/agenda | Ainda não há requisito implementado em todas as telas | Pendente |
-| Chatbot Zelinho com NLU avaliado | Existe tela/atalho, mas não há classificador nem bateria Q3/Q4 | Pendente |
+| Chatbot Zelinho com NLU avaliado | Motor local ativo; bateria formal Q3/Q4 ainda não foi executada | Parcial |
 | Recuperação de senha, Google login e avatar persistido | Não são fluxos completos no código atual | Pendente |
 | Testes em navegadores reais | Não executados pelo agente | Pendente do dono |
 

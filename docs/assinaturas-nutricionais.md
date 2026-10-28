@@ -11,8 +11,11 @@ requisição.
 | `POST` | `/assinaturas-nutricionais` | Cria uma assinatura para um pet do tutor. |
 | `GET` | `/assinaturas-nutricionais` | Lista as assinaturas do tutor, da mais recente para a mais antiga. |
 | `GET` | `/assinaturas-nutricionais/:id` | Consulta uma assinatura do tutor. |
-| `PATCH` | `/assinaturas-nutricionais/:id` | Atualiza dados da assinatura ou seu status. |
-| `DELETE` | `/assinaturas-nutricionais/:id` | Cancela a assinatura, definindo o status como `CANCELADA`. |
+| `PATCH` | `/assinaturas-nutricionais/:id` | Atualiza plano, quantidade e consumo; não altera status. |
+| `POST` | `/assinaturas-nutricionais/:id/pausar` | Pausa a assinatura. |
+| `POST` | `/assinaturas-nutricionais/:id/retomar` | Retoma uma assinatura pausada. |
+| `POST` | `/assinaturas-nutricionais/:id/cancelar` | Cancela a assinatura. |
+| `DELETE` | `/assinaturas-nutricionais/:id` | Alias compatível para cancelamento lógico. |
 
 ## Criar uma assinatura
 
@@ -35,14 +38,13 @@ informados. A criação verifica que o pet pertence ao tutor e que o plano
 existe; o ID do plano é validado antes de criar a assinatura.
 
 As respostas de consulta incluem os dados relacionados do pet e do plano. O
-`PATCH` aceita parcialmente `planoId`, `quantidadeRacaoKg`,
-`consumoDiarioEstimadoG` e um `status` de `StatusAssinatura` (`ATIVA`,
-`PAUSADA` ou `CANCELADA`); o `petId` não pode ser alterado. Ao mudar a
+O `PATCH` aceita parcialmente `planoId`, `quantidadeRacaoKg` e
+`consumoDiarioEstimadoG`; o `petId` e o `status` não podem ser alterados por
+essa rota. As transições de status usam as operações próprias acima. Ao mudar a
 quantidade ou o consumo diário, o servidor recalcula a previsão da próxima
 entrega. O cancelamento é lógico: o registro permanece armazenado.
 
-O tutor pode alterar o próprio `status`; regras de transição entre status
-ficam para uma etapa futura.
+Uma assinatura cancelada não pode ser pausada nem retomada.
 
 ## Autorização
 

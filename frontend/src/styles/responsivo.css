@@ -31,6 +31,13 @@
   background: #fff;
 }
 
+.rodape-aplicacao {
+  padding: 1rem 1.125rem calc(5.5rem + env(safe-area-inset-bottom));
+  color: var(--cor-texto-suave);
+  font-size: var(--tamanho-corpo-sm);
+  text-align: center;
+}
+
 .tela-interna {
   display: flex;
   min-height: 100vh;
