@@ -16,6 +16,7 @@ concluída na demonstração.
 | Recomendações integradas | Nest valida o pet, aplica timeout e chama `/recommend` | Atendido |
 | Assinaturas com ciclo controlado | Rotas próprias de pausar, retomar e cancelar com ownership | Atendido nesta rodada |
 | Home, Mobilidade e cadastro completo do pet | React, fluxo manual e builds verificados | Atendido |
+| Identidade visual aplicada | Pacote visual em `frontend/public/assets` e hero interativo com CTA | Atendido nesta rodada |
 | Zelinho local | Classificador determinístico de intenções para dúvidas de serviços | Atendido nesta rodada |
 | Estrutura semântica | Header, nav, main, section e footer na aplicação autenticada | Atendido nesta rodada |
 | Axe em Home e Mobilidade | 0 violações registradas em `docs/validacao-bloco2.md` | Atendido nessas duas telas |

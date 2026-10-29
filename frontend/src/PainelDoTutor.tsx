@@ -262,6 +262,40 @@ function ChipDeStatus({ status }: { status: string }) {
   )
 }
 
+function HeroInterativo({ onAbrirServico }: { onAbrirServico?: (servico: ServicoId) => void }) {
+  return (
+    <section className="hero-interativo" aria-labelledby="titulo-hero">
+      <div className="hero-interativo__conteudo">
+        <span className="hero-interativo__eyebrow">Cuidado que acompanha</span>
+        <h2 id="titulo-hero">Um jeito mais leve de cuidar todos os dias.</h2>
+        <p>Encontre o próximo cuidado do seu pet em poucos passos.</p>
+        <button
+          className="hero-interativo__cta"
+          type="button"
+          onClick={() => onAbrirServico?.('mobilidade')}
+        >
+          Encontrar um passeio
+          <ChevronRight aria-hidden="true" size={18} />
+        </button>
+      </div>
+      <div className="hero-interativo__visual">
+        <img
+          src="/assets/fotos/01_cao_retrato_dourado.jpg"
+          alt="Cachorro dourado olhando para a câmera em um parque"
+        />
+        <span className="hero-interativo__badge hero-interativo__badge--status">
+          <CheckCircle2 aria-hidden="true" size={15} />
+          Cuidado em dia
+        </span>
+        <span className="hero-interativo__badge hero-interativo__badge--coins">
+          <CircleDollarSign aria-hidden="true" size={15} />
+          +50 ZeloCoins
+        </span>
+      </div>
+    </section>
+  )
+}
+
 function CartaoProximoCuidado({
   cuidado,
   estado,
@@ -524,6 +558,7 @@ export function PainelDoTutor({
         onAbrirPerfil={onAbrirPerfil}
       />
       <main className="conteudo-home" tabIndex={-1}>
+        <HeroInterativo onAbrirServico={onAbrirServico} />
         <SaudacaoComPet
           tutor={tutor}
           estadoTutor={estadoTutor}

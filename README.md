@@ -98,6 +98,14 @@ registros de demonstração em dados de usuários reais. Consulte
 [`docs/dados-demonstracao-ml.md`](./docs/dados-demonstracao-ml.md) para os
 detalhes e resultados registrados.
 
+## Recursos visuais
+
+O frontend inclui o pacote visual de protótipo em
+[`frontend/public/assets/`](./frontend/public/assets/), com fotos geradas por
+IA e ícones SVG originais. O primeiro uso está no hero interativo da home
+autenticada; consulte [`docs/recursos-visuais.md`](./docs/recursos-visuais.md)
+antes de reutilizar as imagens em cards de serviços.
+
 ## Demonstração
 
 Após criar/popular o banco com o seed:

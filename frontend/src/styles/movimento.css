@@ -1,4 +1,16 @@
 @media (prefers-reduced-motion: no-preference) {
+  .hero-interativo__visual img {
+    animation: flutuar-hero 5s ease-in-out infinite;
+  }
+
+  .hero-interativo__badge {
+    animation: aparecer-hero 450ms ease both;
+  }
+
+  .hero-interativo__badge--coins {
+    animation-delay: 120ms;
+  }
+
   .linha-de-servico {
     transition: transform 150ms ease;
   }
@@ -11,6 +23,27 @@
     from {
       opacity: 0;
       transform: translateY(4px);
+    }
+
+    @keyframes flutuar-hero {
+      0%,
+      100% {
+        transform: translateY(0) rotate(2deg);
+      }
+      50% {
+        transform: translateY(-5px) rotate(-1deg);
+      }
+    }
+
+    @keyframes aparecer-hero {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     to {
       opacity: 1;
