@@ -112,7 +112,24 @@ export function TelaCadastroDoPet({
     }
     setEstadoFoto({ tipo: 'enviando' })
     const leitor = new FileReader()
-    leitor.onload = () => setEstadoFoto({ tipo: 'pronta', preview: leitor.result as string })
+    leitor.onload = () => {
+      const imagem = new Image()
+      imagem.onload = () => {
+        const escala = Math.min(1, 512 / Math.max(imagem.width, imagem.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.max(1, Math.round(imagem.width * escala))
+        canvas.height = Math.max(1, Math.round(imagem.height * escala))
+        const contexto = canvas.getContext('2d')
+        if (!contexto) {
+          setEstadoFoto({ tipo: 'erro', mensagem: 'Seu navegador não conseguiu preparar essa foto.' })
+          return
+        }
+        contexto.drawImage(imagem, 0, 0, canvas.width, canvas.height)
+        setEstadoFoto({ tipo: 'pronta', preview: canvas.toDataURL('image/jpeg', 0.78) })
+      }
+      imagem.onerror = () => setEstadoFoto({ tipo: 'erro', mensagem: 'Não deu pra processar essa foto. Tenta outra.' })
+      imagem.src = leitor.result as string
+    }
     leitor.onerror = () => setEstadoFoto({ tipo: 'erro', mensagem: 'Não deu pra ler essa foto. Tenta outra.' })
     leitor.readAsDataURL(arquivo)
   }
@@ -134,6 +151,7 @@ export function TelaCadastroDoPet({
         dataNascimento: dataNascimento || undefined,
         restricoesAlimentares: separarLista(restricoesAlimentares),
         comportamento: separarLista(comportamento),
+        fotoUrl: estadoFoto.tipo === 'pronta' ? estadoFoto.preview : undefined,
       }, token)
       setEstadoEnvio('sucesso')
       onPetCriado()

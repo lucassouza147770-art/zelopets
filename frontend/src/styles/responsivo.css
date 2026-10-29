@@ -13,6 +13,84 @@
   padding: 1rem;
 }
 
+.tela-login {
+  box-sizing: border-box;
+  min-height: 100vh;
+  justify-content: center;
+  border-radius: 1.5rem;
+  background: #F7F7DC;
+}
+
+.login-marca {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--cor-dominante-escura);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.login-marca img {
+  width: 52px;
+  height: 52px;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.login-eyebrow,
+.login-nota {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: var(--tamanho-corpo-sm);
+  text-align: center;
+}
+
+.tela-login h1 {
+  margin: 0;
+  color: var(--cor-dominante-escura);
+  font-size: 2rem;
+  text-align: center;
+}
+
+.tela-login label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  color: var(--cor-dominante-escura);
+  font-weight: 600;
+}
+
+.tela-login input {
+  min-height: 46px;
+  box-sizing: border-box;
+  border: 2px solid var(--cor-acento);
+  border-radius: 0.65rem;
+  padding: 0 0.75rem;
+  background: #FFFEF0;
+  color: var(--cor-texto);
+  font: inherit;
+}
+
+.tela-login button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 0.65rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--cor-dominante-escura);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tela-login .login-cta {
+  background: var(--cor-acento-escura);
+  color: #fff;
+  text-transform: uppercase;
+}
+
 .home-do-tutor {
   width: min(100%, 480px);
   min-height: 100vh;
@@ -22,6 +100,32 @@
   background: #fff;
 }
 
+.hero-interativo__controles {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.25rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--cor-texto-sobre-dominante);
+  font-size: 0.7rem;
+}
+
+.hero-interativo__controles button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  background: rgba(31, 90, 67, 0.7);
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .aplicacao-autenticada {
   width: min(100%, 480px);
   min-height: 100vh;
@@ -29,6 +133,124 @@
   margin-inline: auto;
   padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
   background: #fff;
+}
+
+.calendario-agenda {
+  width: 100%;
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: var(--cor-superficie);
+}
+
+.calendario-agenda__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.calendario-agenda__cabecalho h2 {
+  margin: 0;
+  font-family: var(--fonte-corpo);
+  font-size: 1.1rem;
+}
+
+.calendario-agenda__cabecalho button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cor-menta-clara);
+  color: var(--cor-dominante-escura);
+  font: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.calendario-agenda__dias,
+.calendario-agenda__semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.calendario-agenda__semana {
+  color: var(--cor-texto-suave);
+  font-size: 0.7rem;
+}
+
+.calendario-agenda__dia {
+  position: relative;
+  min-height: 38px;
+  border: 0;
+  border-radius: 0.65rem;
+  background: #fff;
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+.calendario-agenda__dia--vazio {
+  background: transparent;
+  cursor: default;
+}
+
+.calendario-agenda__dia--hoje {
+  outline: 2px solid var(--cor-acento);
+}
+
+.calendario-agenda__dia--marcado::after {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cor-dominante);
+  content: '';
+  transform: translateX(-50%);
+}
+
+.calendario-agenda__selecionado {
+  margin: 0.75rem 0 0;
+  color: var(--cor-dominante-escura);
+  font-size: var(--tamanho-corpo-sm);
+  font-weight: 600;
+}
+
+.carteira-destaque {
+  display: grid;
+  width: 100%;
+  gap: 0.5rem;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, var(--cor-dominante), var(--cor-dominante-escura));
+  color: #fff;
+}
+
+.carteira-destaque strong {
+  font-size: 2rem;
+}
+
+.carteira-acoes {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.carteira-acao {
+  min-height: 86px;
+  border: 0;
+  border-radius: 1rem;
+  padding: 0.75rem;
+  background: var(--cor-acento-suave);
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
 }
 
 .rodape-aplicacao {

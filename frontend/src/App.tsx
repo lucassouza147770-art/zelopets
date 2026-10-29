@@ -52,6 +52,8 @@ function TelaAgenda({
 }) {
   const [cuidados, setCuidados] = useState<Cuidado[]>([])
   const [estado, setEstado] = useState<'carregando' | 'ok' | 'erro'>('carregando')
+  const [mes, setMes] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1))
+  const [diaSelecionado, setDiaSelecionado] = useState<number | null>(new Date().getDate())
 
   useEffect(() => {
     let ativa = true
@@ -75,29 +77,44 @@ function TelaAgenda({
     }
   }, [onSessaoExpirada, token])
 
+  const inicio = new Date(mes.getFullYear(), mes.getMonth(), 1)
+  const diasNoMes = new Date(mes.getFullYear(), mes.getMonth() + 1, 0).getDate()
+  const deslocamento = (inicio.getDay() + 6) % 7
+  const cuidadosDoDia = cuidados.filter((cuidado) => {
+    const data = new Date(cuidado.dataHora)
+    return data.getFullYear() === mes.getFullYear() && data.getMonth() === mes.getMonth() && data.getDate() === diaSelecionado
+  })
+
   return (
     <TelaInterna titulo="Agenda" onVoltar={onVoltar}>
       {estado === 'carregando' ? (
         <p aria-busy="true">Carregando seus próximos cuidados...</p>
       ) : estado === 'erro' ? (
         <p role="alert">Não foi possível carregar a agenda. Tente novamente.</p>
-      ) : cuidados.length === 0 ? (
-        <p>Nenhum cuidado agendado. Que tal um passeio?</p>
       ) : (
-        <ul className="lista-agenda">
-          {cuidados.map((cuidado, indice) => (
-            <li className="item-agenda" key={`${cuidado.tipo}-${cuidado.dataHora}-${indice}`}>
-              <span className="item-agenda__data">
-                {new Intl.DateTimeFormat('pt-BR', {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                }).format(new Date(cuidado.dataHora))}
-              </span>
-              <strong>{cuidado.tipo === 'PASSEIO' ? 'Passeio' : cuidado.tipo === 'HOSPEDAGEM' ? 'Hospedagem' : 'Nutrição'}</strong>
-              <span>{cuidado.petNome}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <section className="calendario-agenda" aria-label="Calendário de cuidados">
+            <div className="calendario-agenda__cabecalho">
+              <button type="button" aria-label="Mês anterior" onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() - 1, 1))}>‹</button>
+              <h2>{new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(mes)}</h2>
+              <button type="button" aria-label="Próximo mês" onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() + 1, 1))}>›</button>
+            </div>
+            <div className="calendario-agenda__semana">{['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((dia, indice) => <span key={`${dia}-${indice}`}>{dia}</span>)}</div>
+            <div className="calendario-agenda__dias">
+              {Array.from({ length: deslocamento }, (_, indice) => <span className="calendario-agenda__dia calendario-agenda__dia--vazio" key={`vazio-${indice}`} />)}
+              {Array.from({ length: diasNoMes }, (_, indice) => {
+                const dia = indice + 1
+                const marcado = cuidados.some((cuidado) => {
+                  const data = new Date(cuidado.dataHora)
+                  return data.getFullYear() === mes.getFullYear() && data.getMonth() === mes.getMonth() && data.getDate() === dia
+                })
+                return <button className={`calendario-agenda__dia ${marcado ? 'calendario-agenda__dia--marcado' : ''} ${dia === new Date().getDate() && mes.getMonth() === new Date().getMonth() ? 'calendario-agenda__dia--hoje' : ''}`} type="button" key={dia} onClick={() => setDiaSelecionado(dia)}>{dia}</button>
+              })}
+            </div>
+            {diaSelecionado && <p className="calendario-agenda__selecionado">{cuidadosDoDia.length ? `${cuidadosDoDia.length} cuidado(s) neste dia` : 'Nenhum cuidado neste dia'}</p>}
+          </section>
+          {cuidadosDoDia.length > 0 && <ul className="lista-agenda">{cuidadosDoDia.map((cuidado, indice) => <li className="item-agenda" key={`${cuidado.tipo}-${cuidado.dataHora}-${indice}`}><span className="item-agenda__data">{new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }).format(new Date(cuidado.dataHora))}</span><strong>{cuidado.tipo === 'PASSEIO' ? 'Passeio' : cuidado.tipo === 'HOSPEDAGEM' ? 'Hospedagem' : 'Nutrição'}</strong><span>{cuidado.petNome}</span></li>)}</ul>}
+        </>
       )}
     </TelaInterna>
   )
@@ -324,9 +341,19 @@ function TelaCarteira({
       ) : estado === 'erro' ? (
         <p role="alert">Não foi possível carregar seu saldo. Tente novamente.</p>
       ) : (
-        <p className="saldo-carteira">{tutor?.zeloCoins.toLocaleString('pt-BR')} ZeloCoins</p>
+        <>
+          <section className="carteira-destaque">
+            <span>Saldo disponível</span>
+            <strong>{tutor?.zeloCoins.toLocaleString('pt-BR')} ZeloCoins</strong>
+            <span>Use seus pontos para desbloquear benefícios.</span>
+          </section>
+          <section className="carteira-acoes" aria-label="Ações da carteira">
+            <button className="carteira-acao" type="button">Trocar por desconto<br /><small>Em breve</small></button>
+            <button className="carteira-acao" type="button">Ganhar mais moedas<br /><small>Avalie um serviço</small></button>
+          </section>
+        </>
       )}
-      <p>O histórico e as regras de acúmulo estão em construção.</p>
+      <p className="texto-apoio">Histórico e resgates serão ativados no fluxo de pagamento sandbox.</p>
     </TelaInterna>
   )
 }

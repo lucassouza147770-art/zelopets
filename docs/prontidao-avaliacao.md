@@ -19,6 +19,7 @@ concluída na demonstração.
 | Identidade visual aplicada | Pacote visual em `frontend/public/assets` e hero interativo com CTA | Atendido nesta rodada |
 | Gêmeo Digital visual | Perfil do pet com características cadastradas e recomendações reais | Atendido nesta rodada |
 | Zelinho persistente | Mascote fixo usando o ícone visual fornecido e o classificador local | Atendido nesta rodada |
+| Pagamento sandbox | Contrato e regras documentados; implementação de simulação pendente | Preparado |
 | Zelinho local | Classificador determinístico de intenções para dúvidas de serviços | Atendido nesta rodada |
 | Estrutura semântica | Header, nav, main, section e footer na aplicação autenticada | Atendido nesta rodada |
 | Axe em Home e Mobilidade | 0 violações registradas em `docs/validacao-bloco2.md` | Atendido nessas duas telas |

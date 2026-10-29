@@ -136,6 +136,10 @@ saldo de demonstração. As rotas de tutor e agenda requerem autenticação JWT.
 As limitações deliberadas de escopo estão em
 [`docs/limitacoes.md`](./docs/limitacoes.md).
 
+O fluxo de pagamento ainda é sandbox e está especificado em
+[`docs/pagamento-sandbox.md`](./docs/pagamento-sandbox.md); nenhuma cobrança
+real ou credencial de provedor é usada.
+
 ## Verificações
 
 ```powershell

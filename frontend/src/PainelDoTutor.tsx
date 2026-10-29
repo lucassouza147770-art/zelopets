@@ -262,13 +262,27 @@ function ChipDeStatus({ status }: { status: string }) {
   )
 }
 
+const heroSlides = [
+  { imagem: '/assets/fotos/01_cao_retrato_dourado.jpg', titulo: 'Um jeito mais leve de cuidar todos os dias.', texto: 'Encontre o próximo cuidado do seu pet em poucos passos.' },
+  { imagem: '/assets/fotos/03_cao_correndo_gramado.jpg', titulo: 'Mais movimento, mais momentos juntos.', texto: 'Encontre passeios compatíveis com a energia do seu cão.' },
+  { imagem: '/assets/fotos/06_cao_descansando.jpg', titulo: 'Cuidado também é saber desacelerar.', texto: 'Planeje uma rotina de descanso e bem-estar.' },
+]
+
 function HeroInterativo({ onAbrirServico }: { onAbrirServico?: (servico: ServicoId) => void }) {
+  const [slide, setSlide] = useState(0)
+  const atual = heroSlides[slide]
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setSlide((valor) => (valor + 1) % heroSlides.length), 6000)
+    return () => window.clearInterval(timer)
+  }, [])
+
   return (
-    <section className="hero-interativo" aria-labelledby="titulo-hero">
+    <section className="hero-interativo" aria-roledescription="carrossel" aria-label="Destaques ZeloPets" aria-labelledby="titulo-hero">
       <div className="hero-interativo__conteudo">
         <span className="hero-interativo__eyebrow">Cuidado que acompanha</span>
-        <h2 id="titulo-hero">Um jeito mais leve de cuidar todos os dias.</h2>
-        <p>Encontre o próximo cuidado do seu pet em poucos passos.</p>
+        <h2 id="titulo-hero">{atual.titulo}</h2>
+        <p>{atual.texto}</p>
         <button
           className="hero-interativo__cta"
           type="button"
@@ -279,10 +293,7 @@ function HeroInterativo({ onAbrirServico }: { onAbrirServico?: (servico: Servico
         </button>
       </div>
       <div className="hero-interativo__visual">
-        <img
-          src="/assets/fotos/01_cao_retrato_dourado.jpg"
-          alt="Cachorro dourado olhando para a câmera em um parque"
-        />
+        <img src={atual.imagem} alt="Imagem ilustrativa de cuidado para pets" />
         <span className="hero-interativo__badge hero-interativo__badge--status">
           <CheckCircle2 aria-hidden="true" size={15} />
           Cuidado em dia
@@ -291,6 +302,11 @@ function HeroInterativo({ onAbrirServico }: { onAbrirServico?: (servico: Servico
           <CircleDollarSign aria-hidden="true" size={15} />
           +50 ZeloCoins
         </span>
+        <div className="hero-interativo__controles">
+          <button type="button" aria-label="Slide anterior" onClick={() => setSlide((slide - 1 + heroSlides.length) % heroSlides.length)}>‹</button>
+          <span>{slide + 1} / {heroSlides.length}</span>
+          <button type="button" aria-label="Próximo slide" onClick={() => setSlide((slide + 1) % heroSlides.length)}>›</button>
+        </div>
       </div>
     </section>
   )

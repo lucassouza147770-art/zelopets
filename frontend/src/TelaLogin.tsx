@@ -30,7 +30,12 @@ export function TelaLogin({ onAutenticado }: { onAutenticado: () => void }) {
 
   return (
     <main className="tela-login">
-      <h1>ZeloPets</h1>
+      <div className="login-marca">
+        <img src="/assets/icones/coracao_pata.svg" alt="" />
+        <span>ZeloPets</span>
+      </div>
+      <p className="login-eyebrow">{modo === 'login' ? 'Cuidado que acompanha vocês' : 'Comece o perfil do seu pet'}</p>
+      <h1>{modo === 'login' ? 'Bem-vindo de volta!' : 'Crie uma conta conosco!'}</h1>
       {modo === 'registro' && (
         <label>
           Nome
@@ -46,12 +51,13 @@ export function TelaLogin({ onAutenticado }: { onAutenticado: () => void }) {
         <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
       </label>
       {estado === 'erro' && mensagemErro && <p className="tela-login__erro">{mensagemErro}</p>}
-      <button type="button" onClick={handleEnviar} disabled={estado === 'enviando'}>
+      <button className="login-cta" type="button" onClick={handleEnviar} disabled={estado === 'enviando'}>
         {estado === 'enviando' ? 'Enviando...' : modo === 'login' ? 'Entrar' : 'Criar conta'}
       </button>
       <button type="button" onClick={() => setModo(modo === 'login' ? 'registro' : 'login')}>
         {modo === 'login' ? 'Ainda não tenho conta' : 'Já tenho conta'}
       </button>
+      <p className="login-nota">Login seguro com sua conta ZeloPets.</p>
     </main>
   )
 }
