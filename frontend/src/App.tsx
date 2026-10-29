@@ -14,12 +14,6 @@ type EstadoSessao = 'verificando' | 'deslogado' | 'cadastro-pet' | 'autenticado'
 type Rota = TelaPrincipal | 'carteira' | 'servico' | 'gemeo'
 type ServicoId = 'mobilidade' | 'hotel' | 'nutricao'
 
-const nomesServico: Record<ServicoId, string> = {
-  mobilidade: 'Mobilidade',
-  hotel: 'Hotel ZeloPets',
-  nutricao: 'Nutrição',
-}
-
 function TelaInterna({
   titulo,
   onVoltar,
@@ -358,6 +352,41 @@ function TelaCarteira({
   )
 }
 
+function TelaServico({ servico, onVoltar }: { servico: ServicoId; onVoltar: () => void }) {
+  const dados = {
+    hotel: {
+      titulo: 'Hotel ZeloPets',
+      imagem: '/assets/fotos/04_hotel_pet_area_convivencia.jpg',
+      descricao: 'Hospedagem com ambientes preparados para o ritmo do seu pet.',
+      itens: ['Pacotes Essencial, Conforto e Premium', 'Escolha de convivência', 'Nível de contato personalizado'],
+    },
+    nutricao: {
+      titulo: 'Nutrição',
+      imagem: '/assets/fotos/08_nutricao_pet_ingredientes.jpg',
+      descricao: 'Planos alimentares por assinatura baseados no perfil cadastrado.',
+      itens: ['Previsão da próxima entrega', 'Acompanhamento do consumo', 'Opções para restrições informadas'],
+    },
+    mobilidade: {
+      titulo: 'Mobilidade',
+      imagem: '/assets/fotos/03_cao_correndo_gramado.jpg',
+      descricao: 'Passeios compatíveis com a energia e o porte do seu pet.',
+      itens: ['Prestadores recomendados', 'Agendamento pelo app', 'Status visível na Agenda'],
+    },
+  }[servico]
+
+  return (
+    <TelaInterna titulo={dados.titulo} onVoltar={onVoltar}>
+      <img className="servico-capa" src={dados.imagem} alt="" />
+      <p>{dados.descricao}</p>
+      <ul className="lista-beneficios-servico">{dados.itens.map((item) => <li key={item}>{item}</li>)}</ul>
+      <button className="acao-secundaria" type="button" disabled>
+        Em breve no sandbox
+      </button>
+      <p className="texto-apoio">O fluxo de pagamento será ativado depois da validação do serviço.</p>
+    </TelaInterna>
+  )
+}
+
 function responderZelinho(pergunta: string) {
   const texto = pergunta.toLocaleLowerCase('pt-BR')
   if (texto.includes('agenda') || texto.includes('agendamento')) {
@@ -544,9 +573,7 @@ export function App() {
           onAbrirAgenda={() => navegar('agenda')}
         />
       ) : (
-        <TelaInterna titulo={`${nomesServico[servicoAtivo]} — em construção`} onVoltar={() => navegar('inicio')}>
-          <p>Este serviço estará disponível em breve.</p>
-        </TelaInterna>
+        <TelaServico servico={servicoAtivo} onVoltar={() => navegar('inicio')} />
       )}
       <MascoteZelinho onAbrir={() => navegar('zelinho')} />
       <footer className="rodape-aplicacao">
