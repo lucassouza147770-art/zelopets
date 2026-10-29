@@ -1,4 +1,8 @@
 @media (prefers-reduced-motion: no-preference) {
+  .mascote-zelinho {
+    animation: pulsar-zelinho 3.5s ease-in-out infinite;
+  }
+
   .hero-interativo__visual img {
     animation: flutuar-hero 5s ease-in-out infinite;
   }
@@ -39,6 +43,16 @@
       from {
         opacity: 0;
         transform: translateY(6px);
+      }
+
+      @keyframes pulsar-zelinho {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-3px);
+        }
       }
       to {
         opacity: 1;

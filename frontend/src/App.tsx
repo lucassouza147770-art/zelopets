@@ -8,9 +8,10 @@ import { TelaCadastroDoPet } from './TelaCadastroDoPet'
 import { TelaLogin } from './TelaLogin'
 import { obterTutor, type Tutor } from './api/tutor'
 import { TelaMobilidade } from './Mobilidade'
+import { obterRecomendacoes, type RespostaRecomendacao } from './api/recomendacao'
 
 type EstadoSessao = 'verificando' | 'deslogado' | 'cadastro-pet' | 'autenticado' | 'erro'
-type Rota = TelaPrincipal | 'carteira' | 'servico'
+type Rota = TelaPrincipal | 'carteira' | 'servico' | 'gemeo'
 type ServicoId = 'mobilidade' | 'hotel' | 'nutricao'
 
 const nomesServico: Record<ServicoId, string> = {
@@ -106,10 +107,12 @@ function TelaPerfil({
   token,
   onSessaoExpirada,
   onVoltar,
+  onAbrirGemeo,
 }: {
   token: string
   onSessaoExpirada: () => void
   onVoltar: () => void
+  onAbrirGemeo: () => void
 }) {
   const [tutor, setTutor] = useState<Tutor | null>(null)
   const [pets, setPets] = useState<{ id: string; nome: string }[]>([])
@@ -153,13 +156,131 @@ function TelaPerfil({
           {pets.length === 0 ? (
             <p>Nenhum cão cadastrado.</p>
           ) : (
-            <ul className="lista-pets">
-              {pets.map((pet) => <li key={pet.id}>{pet.nome}</li>)}
-            </ul>
+            <>
+              <ul className="lista-pets">
+                {pets.map((pet) => <li key={pet.id}>{pet.nome}</li>)}
+              </ul>
+              <button className="acao-secundaria" type="button" onClick={onAbrirGemeo}>
+                Abrir gêmeo digital
+              </button>
+            </>
           )}
         </>
       )}
     </TelaInterna>
+  )
+}
+
+type PetDetalhado = {
+  id: string
+  nome: string
+  fotoUrl?: string | null
+  especie: string
+  raca?: string | null
+  dataNascimento?: string | null
+  porte: string
+  pesoKg?: number | null
+  nivelEnergia: string
+  restricoesAlimentares: string[]
+  comportamento: string[]
+}
+
+function rotuloPet(valor: string) {
+  return valor.toLocaleLowerCase('pt-BR').replace('_', ' ')
+}
+
+function TelaGemeoDigital({
+  token,
+  onSessaoExpirada,
+  onVoltar,
+}: {
+  token: string
+  onSessaoExpirada: () => void
+  onVoltar: () => void
+}) {
+  const [pet, setPet] = useState<PetDetalhado | null>(null)
+  const [recomendacoes, setRecomendacoes] = useState<RespostaRecomendacao | null>(null)
+  const [estado, setEstado] = useState<'carregando' | 'ok' | 'erro'>('carregando')
+
+  useEffect(() => {
+    let ativa = true
+    api.get<PetDetalhado[]>('/pets', token)
+      .then(async (pets) => {
+        const selecionado = pets[0]
+        if (!selecionado) throw new Error('Nenhum pet cadastrado')
+        const resultado = await obterRecomendacoes(token, selecionado.id).catch(() => null)
+        if (!ativa) return
+        setPet(selecionado)
+        setRecomendacoes(resultado)
+        setEstado('ok')
+      })
+      .catch((erro: unknown) => {
+        if (!ativa) return
+        if (erro instanceof ApiError && erro.status === 401) {
+          onSessaoExpirada()
+          return
+        }
+        setEstado('erro')
+      })
+    return () => {
+      ativa = false
+    }
+  }, [onSessaoExpirada, token])
+
+  return (
+    <TelaInterna titulo="Gêmeo digital" onVoltar={onVoltar}>
+      {estado === 'carregando' ? (
+        <p aria-busy="true">Preparando o perfil vivo do seu cão...</p>
+      ) : estado === 'erro' || !pet ? (
+        <p role="alert">Não foi possível carregar o perfil do seu cão.</p>
+      ) : (
+        <div className="gemeo-digital">
+          <section className="gemeo-digital__identidade" aria-labelledby="nome-gemeo">
+            <div className="gemeo-digital__foto">
+              {pet.fotoUrl ? <img src={pet.fotoUrl} alt="" /> : pet.nome.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="texto-apoio">Perfil baseado nos dados cadastrados</p>
+              <h2 id="nome-gemeo">{pet.nome}</h2>
+              <p>{pet.raca || 'Raça não informada'} · porte {rotuloPet(pet.porte)}</p>
+            </div>
+          </section>
+          <section className="gemeo-digital__dados" aria-labelledby="dados-gemeo">
+            <h2 id="dados-gemeo">Características</h2>
+            <dl className="grade-gemeo">
+              <div><dt>Energia</dt><dd>{rotuloPet(pet.nivelEnergia)}</dd></div>
+              <div><dt>Peso</dt><dd>{pet.pesoKg ? `${pet.pesoKg} kg` : 'Não informado'}</dd></div>
+              <div><dt>Comportamento</dt><dd>{pet.comportamento.length ? pet.comportamento.join(', ') : 'Não informado'}</dd></div>
+              <div><dt>Restrições</dt><dd>{pet.restricoesAlimentares.length ? pet.restricoesAlimentares.join(', ') : 'Nenhuma informada'}</dd></div>
+            </dl>
+          </section>
+          <section className="gemeo-digital__recomendacoes" aria-labelledby="recomendacoes-gemeo">
+            <h2 id="recomendacoes-gemeo">Recomendações</h2>
+            {recomendacoes ? (
+              <>
+                <p className="texto-apoio">Perfil de compatibilidade: {rotuloPet(recomendacoes.perfilDoCluster.nivel_energia)} energia, porte {rotuloPet(recomendacoes.perfilDoCluster.porte)}.</p>
+                {recomendacoes.prestadores.length ? (
+                  <ul className="lista-recomendacoes">
+                    {recomendacoes.prestadores.map((prestador) => (
+                      <li key={prestador.id}><strong>{prestador.nome}</strong><span>{prestador.motivo}</span></li>
+                    ))}
+                  </ul>
+                ) : <p>Nenhum prestador compatível foi encontrado no momento.</p>}
+              </>
+            ) : <p>Recomendações indisponíveis no momento. Os dados do perfil continuam disponíveis.</p>}
+          </section>
+        </div>
+      )}
+    </TelaInterna>
+  )
+}
+
+function MascoteZelinho({ onAbrir }: { onAbrir: () => void }) {
+  return (
+    <button className="mascote-zelinho" type="button" onClick={onAbrir} aria-label="Abrir conversa com o Zelinho">
+      <img src="/assets/icones/chat_zelinho.svg" alt="" />
+      <span>Fale comigo</span>
+    </button>
   )
 }
 
@@ -381,9 +502,11 @@ export function App() {
       ) : rota === 'agenda' ? (
         <TelaAgenda token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} />
       ) : rota === 'perfil' ? (
-        <TelaPerfil token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} />
+        <TelaPerfil token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} onAbrirGemeo={() => setRota('gemeo')} />
       ) : rota === 'carteira' ? (
         <TelaCarteira token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} />
+      ) : rota === 'gemeo' ? (
+        <TelaGemeoDigital token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('perfil')} />
       ) : rota === 'zelinho' ? (
         <TelaZelinho onVoltar={() => navegar('inicio')} />
       ) : rota === 'servico' && servicoAtivo === 'mobilidade' ? (
@@ -398,6 +521,7 @@ export function App() {
           <p>Este serviço estará disponível em breve.</p>
         </TelaInterna>
       )}
+      <MascoteZelinho onAbrir={() => navegar('zelinho')} />
       <footer className="rodape-aplicacao">
         <small>ZeloPets · cuidado que entende seu cão</small>
       </footer>

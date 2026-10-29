@@ -127,6 +127,7 @@ saldo de demonstração. As rotas de tutor e agenda requerem autenticação JWT.
   para agendar passeios.
 - **Agenda:** próximos cuidados do tutor.
 - **Zelinho:** classificador local de dúvidas sobre os serviços; integração LLM aguarda chave.
+- **Gêmeo Digital:** perfil visual baseado nos dados cadastrados do pet e nas recomendações disponíveis.
 - **Perfil:** dados do tutor e cães cadastrados.
 - **Carteira:** saldo atual de ZeloCoins; histórico e regras de acúmulo ainda
   estão em construção.
