@@ -37,6 +37,17 @@ enum TipoPrestador {
   HOTEL
 }
 
+enum TipoPasseio {
+  PASSEIO
+  TRANSPORTE
+}
+
+enum FaixaDistancia {
+  ATE_3KM
+  DE_3_A_8KM
+  DE_8_A_15KM
+}
+
 enum StatusAgendamento {
   PENDENTE
   CONFIRMADO
@@ -169,6 +180,10 @@ model Passeio {
   prestadorId    String?
   prestador      Prestador?        @relation(fields: [prestadorId], references: [id])
 
+  tipo            TipoPasseio       @default(PASSEIO)
+  origem          String?
+  destino         String?
+  faixaDistancia  FaixaDistancia?
   dataHora        DateTime
   duracaoMinutos  Int               @default(30)
   status          StatusAgendamento @default(PENDENTE)

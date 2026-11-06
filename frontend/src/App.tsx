@@ -341,10 +341,7 @@ function TelaCarteira({
             <strong>{tutor?.zeloCoins.toLocaleString('pt-BR')} ZeloCoins</strong>
             <span>Use seus pontos para desbloquear benefícios.</span>
           </section>
-          <section className="carteira-acoes" aria-label="Ações da carteira">
-            <button className="carteira-acao" type="button">Trocar por desconto<br /><small>Em breve</small></button>
-            <button className="carteira-acao" type="button">Ganhar mais moedas<br /><small>Avalie um serviço</small></button>
-          </section>
+          <p className="carteira-aviso">Trocas e formas de ganhar moedas serão liberadas em breve.</p>
         </>
       )}
       <p className="texto-apoio">Histórico e resgates serão ativados no fluxo de pagamento sandbox.</p>
@@ -379,10 +376,7 @@ function TelaServico({ servico, onVoltar }: { servico: ServicoId; onVoltar: () =
       <img className="servico-capa" src={dados.imagem} alt="" />
       <p>{dados.descricao}</p>
       <ul className="lista-beneficios-servico">{dados.itens.map((item) => <li key={item}>{item}</li>)}</ul>
-      <button className="acao-secundaria" type="button" disabled>
-        Em breve no sandbox
-      </button>
-      <p className="texto-apoio">O fluxo de pagamento será ativado depois da validação do serviço.</p>
+      <p className="texto-apoio">Pagamento simulado será oferecido depois da confirmação da reserva.</p>
     </TelaInterna>
   )
 }

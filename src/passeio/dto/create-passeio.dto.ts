@@ -1,7 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { FaixaDistancia, TipoPasseio } from '@prisma/client';
 
 export class CreatePasseioDto {
+  @ApiPropertyOptional({ enum: TipoPasseio, default: TipoPasseio.PASSEIO })
+  @IsOptional()
+  @IsEnum(TipoPasseio)
+  tipo?: TipoPasseio;
+
   @ApiProperty({ description: 'ID de um pet retornado por GET /pets', example: 'id-do-pet' })
   @IsString()
   @IsNotEmpty()
@@ -20,4 +26,19 @@ export class CreatePasseioDto {
   @IsOptional()
   @IsIn([30, 45, 60])
   duracaoMinutos?: 30 | 45 | 60;
+
+  @ApiPropertyOptional({ description: 'Obrigatório para transporte' })
+  @IsOptional()
+  @IsString()
+  origem?: string;
+
+  @ApiPropertyOptional({ description: 'Obrigatório para transporte' })
+  @IsOptional()
+  @IsString()
+  destino?: string;
+
+  @ApiPropertyOptional({ enum: FaixaDistancia })
+  @IsOptional()
+  @IsEnum(FaixaDistancia)
+  faixaDistancia?: FaixaDistancia;
 }

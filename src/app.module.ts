@@ -12,6 +12,7 @@ import { CatalogoModule } from './catalogo/catalogo.module';
 import { TutorModule } from './tutor/tutor.module';
 import { AgendaModule } from './agenda/agenda.module';
 import { RecomendacaoModule } from './recomendacao/recomendacao.module';
+import { PagamentoModule } from './pagamento/pagamento.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RecomendacaoModule } from './recomendacao/recomendacao.module';
     TutorModule,
     AgendaModule,
     RecomendacaoModule,
+    PagamentoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

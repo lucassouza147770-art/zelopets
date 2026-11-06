@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { FaixaDistancia, TipoPasseio } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePasseioDto } from './dto/create-passeio.dto';
 import { UpdatePasseioDto } from './dto/update-passeio.dto';
@@ -8,6 +9,11 @@ const PRECO_POR_DURACAO: Record<30 | 45 | 60, number> = {
   30: 25,
   45: 35,
   60: 45,
+};
+const PRECO_POR_DISTANCIA: Record<FaixaDistancia, number> = {
+  ATE_3KM: 18,
+  DE_3_A_8KM: 30,
+  DE_8_A_15KM: 48,
 };
 
 @Injectable()
@@ -24,14 +30,27 @@ export class PasseioService {
     }
 
     const duracaoMinutos = dto.duracaoMinutos ?? 30;
+    const tipo = dto.tipo ?? TipoPasseio.PASSEIO;
+    if (tipo === TipoPasseio.TRANSPORTE && (!dto.origem || !dto.destino || !dto.faixaDistancia)) {
+      throw new BadRequestException('Transporte exige origem, destino e faixa de distância');
+    }
+    if (tipo === TipoPasseio.PASSEIO && (dto.origem || dto.destino || dto.faixaDistancia)) {
+      throw new BadRequestException('Origem, destino e distância só podem ser usados em transporte');
+    }
     return this.prisma.passeio.create({
       data: {
         tutorId,
         petId: dto.petId,
         prestadorId: dto.prestadorId,
+        tipo,
+        origem: dto.origem,
+        destino: dto.destino,
+        faixaDistancia: dto.faixaDistancia,
         dataHora: new Date(dto.dataHora),
         duracaoMinutos,
-        valor: PRECO_POR_DURACAO[duracaoMinutos],
+        valor: tipo === TipoPasseio.TRANSPORTE
+          ? PRECO_POR_DISTANCIA[dto.faixaDistancia!]
+          : PRECO_POR_DURACAO[duracaoMinutos],
       },
     });
   }

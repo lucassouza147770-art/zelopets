@@ -11,6 +11,7 @@ from fastapi import FastAPI, Header, HTTPException
 
 from db import buscar_pet_do_tutor, buscar_pets_do_tutor, buscar_prestadores_ativos
 from features import interpretar_centroide, montar_matriz, pets_para_dataframe
+from chatbot.router import router as chatbot_router
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
@@ -40,6 +41,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="ZeloPets - Recomendacao (K-Means)", lifespan=lifespan)
+app.include_router(chatbot_router)
 
 
 @app.get("/health")

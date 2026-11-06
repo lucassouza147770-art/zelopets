@@ -270,15 +270,17 @@ const heroSlides = [
 
 function HeroInterativo({ onAbrirServico }: { onAbrirServico?: (servico: ServicoId) => void }) {
   const [slide, setSlide] = useState(0)
+  const [pausado, setPausado] = useState(false)
   const atual = heroSlides[slide]
 
   useEffect(() => {
+    if (pausado || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const timer = window.setInterval(() => setSlide((valor) => (valor + 1) % heroSlides.length), 6000)
     return () => window.clearInterval(timer)
-  }, [])
+  }, [pausado])
 
   return (
-    <section className="hero-interativo" aria-roledescription="carrossel" aria-label="Destaques ZeloPets" aria-labelledby="titulo-hero">
+    <section className="hero-interativo" aria-roledescription="carrossel" aria-label="Destaques ZeloPets" aria-labelledby="titulo-hero" onMouseEnter={() => setPausado(true)} onMouseLeave={() => setPausado(false)} onFocus={() => setPausado(true)} onBlur={(evento) => { if (!evento.currentTarget.contains(evento.relatedTarget)) setPausado(false) }}>
       <div className="hero-interativo__conteudo">
         <span className="hero-interativo__eyebrow">Cuidado que acompanha</span>
         <h2 id="titulo-hero">{atual.titulo}</h2>
@@ -303,6 +305,7 @@ function HeroInterativo({ onAbrirServico }: { onAbrirServico?: (servico: Servico
           +50 ZeloCoins
         </span>
         <div className="hero-interativo__controles">
+          <button type="button" aria-label={pausado ? 'Reproduzir destaques' : 'Pausar destaques'} onClick={() => setPausado((valor) => !valor)}>{pausado ? '▶' : 'Ⅱ'}</button>
           <button type="button" aria-label="Slide anterior" onClick={() => setSlide((slide - 1 + heroSlides.length) % heroSlides.length)}>‹</button>
           <span>{slide + 1} / {heroSlides.length}</span>
           <button type="button" aria-label="Próximo slide" onClick={() => setSlide((slide + 1) % heroSlides.length)}>›</button>

@@ -589,7 +589,7 @@
 
 .hero-interativo {
   display: grid;
-  min-height: 220px;
+  min-height: 160px;
   grid-template-columns: minmax(0, 1fr) minmax(130px, 42%);
   gap: 0.5rem;
   overflow: hidden;
@@ -655,7 +655,7 @@
 
 .hero-interativo__visual {
   position: relative;
-  min-height: 190px;
+  min-height: 140px;
   align-self: stretch;
 }
 
