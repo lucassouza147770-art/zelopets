@@ -381,43 +381,42 @@ function TelaServico({ servico, onVoltar }: { servico: ServicoId; onVoltar: () =
   )
 }
 
-function responderZelinho(pergunta: string) {
-  const texto = pergunta.toLocaleLowerCase('pt-BR')
-  if (texto.includes('agenda') || texto.includes('agendamento')) {
-    return 'Você pode consultar seus próximos cuidados na Agenda. Para criar um passeio, abra Mobilidade.'
-  }
-  if (texto.includes('moeda') || texto.includes('zelocoin') || texto.includes('saldo')) {
-    return 'Seu saldo de ZeloCoins fica na Carteira, acessível pelo botão no cabeçalho.'
-  }
-  if (texto.includes('hotel') || texto.includes('hosped')) {
-    return 'O Hotel ZeloPets está em preparação. Em breve você poderá escolher um pacote de hospedagem.'
-  }
-  if (texto.includes('nutri') || texto.includes('ração') || texto.includes('racao')) {
-    return 'A Nutrição funciona por assinatura e permite acompanhar a próxima entrega do seu cão.'
-  }
-  if (texto.includes('passeio') || texto.includes('mobilidade')) {
-    return 'Na Mobilidade você encontra passeadores compatíveis e pode solicitar um passeio.'
-  }
-  return 'Posso ajudar com agenda, passeio, hospedagem, nutrição ou ZeloCoins. O que você gostaria de saber?'
-}
-
-function TelaZelinho({ onVoltar }: { onVoltar: () => void }) {
+function TelaZelinho({ token, onSessaoExpirada, onVoltar }: { token: string; onSessaoExpirada: () => void; onVoltar: () => void }) {
   const [pergunta, setPergunta] = useState('')
-  const [resposta, setResposta] = useState(
-    'Olá! Sou o Zelinho. Posso orientar sobre os serviços do ZeloPets.',
-  )
+  const [respostas, setRespostas] = useState(['Olá! Sou o Zelinho. Posso orientar sobre os serviços do ZeloPets.'])
+  const [estado, setEstado] = useState<'ok' | 'enviando' | 'erro'>('ok')
+  const [erro, setErro] = useState<string | null>(null)
 
-  function enviar(evento: FormEvent<HTMLFormElement>) {
+  async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault()
     const texto = pergunta.trim()
-    if (!texto) return
-    setResposta(responderZelinho(texto))
+    if (!texto || estado === 'enviando') return
+    setEstado('enviando')
+    setErro(null)
+    setRespostas((anteriores) => [...anteriores, `Você: ${texto}`])
     setPergunta('')
+    try {
+      const resultado = await api.post<{ resposta?: string; protocolo?: string }>('/zelinho/mensagens', { texto }, token)
+      setRespostas((anteriores) => [...anteriores, resultado.resposta ?? 'Essa informação está em preparação.'])
+      if (resultado.protocolo) setRespostas((anteriores) => [...anteriores, `Protocolo de atendimento: ${resultado.protocolo}`])
+      setEstado('ok')
+    } catch (erroRecebido: unknown) {
+      if (erroRecebido instanceof ApiError && erroRecebido.status === 401) {
+        onSessaoExpirada()
+        return
+      }
+      setErro(erroRecebido instanceof ApiError ? erroRecebido.message : 'Não foi possível falar com o Zelinho.')
+      setEstado('erro')
+    }
   }
 
   return (
     <TelaInterna titulo="Zelinho" onVoltar={onVoltar}>
-      <p role="status">{resposta}</p>
+      <div role="log" aria-live="polite" aria-label="Conversa com o Zelinho">
+        {respostas.map((resposta, indice) => <p key={`${indice}-${resposta}`} className={indice % 2 ? 'mensagem-chat mensagem-chat--tutor' : 'mensagem-chat'}>{resposta}</p>)}
+      </div>
+      {estado === 'enviando' && <p role="status" aria-busy="true">Zelinho está digitando...</p>}
+      {erro && <p role="alert">{erro}</p>}
       <form className="formulario-zelinho" onSubmit={enviar}>
         <label htmlFor="pergunta-zelinho">Sua dúvida</label>
         <input
@@ -426,9 +425,9 @@ function TelaZelinho({ onVoltar }: { onVoltar: () => void }) {
           onChange={(evento) => setPergunta(evento.target.value)}
           placeholder="Ex.: onde vejo minha agenda?"
         />
-        <button className="acao-secundaria" type="submit">Enviar pergunta</button>
+        <button className="acao-secundaria" type="submit" disabled={estado === 'enviando'}>Enviar pergunta</button>
       </form>
-      <p className="texto-apoio">Motor local ativo. Integração LLM: aguardando chave.</p>
+      <p className="texto-apoio">O Zelinho usa o chatbot Python local e pode errar. Não compartilhe senhas.</p>
     </TelaInterna>
   )
 }
@@ -558,7 +557,7 @@ export function App() {
       ) : rota === 'gemeo' ? (
         <TelaGemeoDigital token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('perfil')} />
       ) : rota === 'zelinho' ? (
-        <TelaZelinho onVoltar={() => navegar('inicio')} />
+        <TelaZelinho token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} />
       ) : rota === 'servico' && servicoAtivo === 'mobilidade' ? (
         <TelaMobilidade
           token={token}

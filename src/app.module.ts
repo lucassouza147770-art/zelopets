@@ -13,6 +13,7 @@ import { TutorModule } from './tutor/tutor.module';
 import { AgendaModule } from './agenda/agenda.module';
 import { RecomendacaoModule } from './recomendacao/recomendacao.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
+import { ZelinhoModule } from './zelinho/zelinho.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PagamentoModule } from './pagamento/pagamento.module';
     AgendaModule,
     RecomendacaoModule,
     PagamentoModule,
+    ZelinhoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
