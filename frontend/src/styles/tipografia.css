@@ -1,9 +1,5 @@
 :root {
-  /* Fraunces nos títulos: serifa quente e editorial, reforça o tom
-     "aconchego" da marca sem parecer infantil.
-     Figtree no corpo: sans humanista com cantos suaves, legível em
-     telas pequenas, sem cair no genérico do Inter/Arial. */
-  --fonte-display: 'Fraunces', serif;
+  --fonte-display: 'Figtree', sans-serif;
   --fonte-corpo: 'Figtree', sans-serif;
 
   --tamanho-corpo-sm: 0.875rem;   /* 14px — legendas, notas */
@@ -23,14 +19,14 @@ body {
 h1 {
   font-family: var(--fonte-display);
   font-size: var(--tamanho-titulo-lg);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.15;
 }
 
 h2 {
   font-family: var(--fonte-display);
   font-size: var(--tamanho-titulo);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
 }
 

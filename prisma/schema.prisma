@@ -87,6 +87,22 @@ enum TipoServicoAvaliado {
   NUTRICAO
 }
 
+enum PapelTutor {
+  TUTOR
+  ADMIN
+}
+
+enum PrioridadeAtendimento {
+  NORMAL
+  ALTA
+}
+
+enum StatusAtendimento {
+  ABERTO
+  EM_ATENDIMENTO
+  RESOLVIDO
+}
+
 // ---------------------------------------------------------------------------
 // USUÁRIOS
 // ---------------------------------------------------------------------------
@@ -98,6 +114,7 @@ model Tutor {
   senhaHash String
   telefone  String?
   zeloCoins Int      @default(0)
+  papel     PapelTutor @default(TUTOR)
   criadoEm  DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
@@ -106,6 +123,25 @@ model Tutor {
   hospedagens              Hospedagem[]
   assinaturasNutricionais  AssinaturaNutricional[]
   avaliacoes               Avaliacao[]
+  atendimentos             AtendimentoHumano[]
+}
+
+model AtendimentoHumano {
+  id              String                @id @default(uuid())
+  protocolo       String                @unique
+  tutorId         String
+  tutor           Tutor                 @relation(fields: [tutorId], references: [id])
+  motivo          String
+  prioridade      PrioridadeAtendimento @default(NORMAL)
+  resumo          String
+  status          StatusAtendimento     @default(ABERTO)
+  respostaEquipe String?
+  abertoEm        DateTime              @default(now())
+  atualizadoEm    DateTime              @updatedAt
+  resolvidoEm     DateTime?
+
+  @@index([tutorId, status])
+  @@index([status, prioridade])
 }
 
 // ---------------------------------------------------------------------------

@@ -30,7 +30,11 @@
 
 body {
   margin: 0;
-  background-color: var(--cor-fundo);
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(168, 230, 200, 0.26), transparent 28rem),
+    radial-gradient(circle at 100% 45%, rgba(251, 235, 203, 0.3), transparent 24rem),
+    var(--cor-fundo);
   color: var(--cor-texto);
 }
 

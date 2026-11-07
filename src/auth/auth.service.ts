@@ -34,7 +34,7 @@ export class AuthService {
       },
     });
 
-    return this.gerarToken(tutor.id, tutor.email);
+    return this.gerarToken(tutor.id, tutor.email, tutor.papel);
   }
 
   async login(dto: LoginDto) {
@@ -51,12 +51,12 @@ export class AuthService {
       throw new UnauthorizedException('E-mail ou senha inválidos');
     }
 
-    return this.gerarToken(tutor.id, tutor.email);
+    return this.gerarToken(tutor.id, tutor.email, tutor.papel);
   }
 
-  private gerarToken(tutorId: string, email: string) {
+  private gerarToken(tutorId: string, email: string, papel: 'TUTOR' | 'ADMIN') {
     return {
-      accessToken: this.jwtService.sign({ sub: tutorId, email }),
+      accessToken: this.jwtService.sign({ sub: tutorId, email, papel }),
     };
   }
 }

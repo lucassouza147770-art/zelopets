@@ -14,6 +14,7 @@ import { AgendaModule } from './agenda/agenda.module';
 import { RecomendacaoModule } from './recomendacao/recomendacao.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { ZelinhoModule } from './zelinho/zelinho.module';
+import { AtendimentoModule } from './atendimento/atendimento.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ZelinhoModule } from './zelinho/zelinho.module';
     RecomendacaoModule,
     PagamentoModule,
     ZelinhoModule,
+    AtendimentoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

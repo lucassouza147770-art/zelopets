@@ -6,6 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "preparar-env": "node scripts/preparar-env.mjs",
+    "verificar": "pnpm preparar-env && pnpm exec nest build && pnpm --dir frontend build && pnpm --dir ml-service exec pytest tests -q",
+    "dev:all": "pnpm preparar-env",
+    "demo:zelinho": "node scripts/demo-zelinho.mjs",
+    "zelinho:smoke": "node scripts/zelinho-smoke.mjs",
     "build": "nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

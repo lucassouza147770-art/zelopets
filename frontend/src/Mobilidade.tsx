@@ -4,6 +4,7 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   Clock3,
+  ChevronRight,
   PawPrint,
   Star,
 } from 'lucide-react'
@@ -268,6 +269,11 @@ export function TelaMobilidade({
         Voltar
       </button>
       <h1>Mobilidade</h1>
+      <section className="mobilidade-capa">
+        <img src="/assets/fotos/03_cao_correndo_gramado.jpg" alt="Cão correndo em um gramado" />
+        <div><span>Mais movimento, mais momentos juntos</span><p>Passeios escolhidos para combinar com a energia do {pet?.nome ?? 'seu pet'}.</p></div>
+      </section>
+      <div className="beneficio-coins"><Star aria-hidden="true" size={18} /><span><strong>Economize com ZeloCoins</strong> use moedas para ganhar desconto no próximo passeio.</span><ChevronRight aria-hidden="true" size={17} /></div>
       <section className="vitrine-recomendados" aria-labelledby="titulo-recomendados">
         <h2 id="titulo-recomendados">
           Recomendados para {pet ? pet.nome : 'seu cão'}

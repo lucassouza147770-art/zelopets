@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { MensagemZelinhoDto } from './dto/mensagem-zelinho.dto';
@@ -16,5 +16,10 @@ export class ZelinhoController {
     @Body() dto: MensagemZelinhoDto,
   ) {
     return this.zelinhoService.responder(req.user.tutorId, dto);
+  }
+
+  @Get('atendimento/atual')
+  atendimentoAtual(@Req() req: { user: { tutorId: string } }) {
+    return this.zelinhoService.obterAtendimentoAtual(req.user.tutorId);
   }
 }

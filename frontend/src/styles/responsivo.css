@@ -139,7 +139,39 @@
   width: 100%;
   border-radius: 1.25rem;
   padding: 1rem;
-  background: var(--cor-superficie);
+  border: 1px solid rgba(47, 122, 92, 0.12);
+  background: linear-gradient(145deg, #eef9f1, #fffaf0);
+  box-shadow: 0 10px 24px rgba(47, 122, 92, 0.08);
+}
+
+.agenda-resumo {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.agenda-resumo > div {
+  display: grid;
+  min-height: 78px;
+  align-content: center;
+  gap: 0.15rem;
+  border: 1px solid rgba(47, 122, 92, 0.1);
+  border-radius: 1rem;
+  padding: 0.6rem;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.agenda-resumo__numero {
+  color: var(--cor-dominante);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.agenda-resumo > div > span:last-child {
+  color: var(--cor-texto-suave);
+  font-size: 0.68rem;
+  line-height: 1.2;
 }
 
 .calendario-agenda__cabecalho {
@@ -186,7 +218,7 @@
   min-height: 38px;
   border: 0;
   border-radius: 0.65rem;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.86);
   color: var(--cor-texto);
   cursor: pointer;
 }
@@ -198,6 +230,8 @@
 
 .calendario-agenda__dia--hoje {
   outline: 2px solid var(--cor-acento);
+  background: var(--cor-acento-suave);
+  font-weight: 700;
 }
 
 .calendario-agenda__dia--marcado::after {
@@ -417,6 +451,71 @@
   padding-left: 0.625rem;
 }
 
+.lista-recomendacoes li > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.lista-recomendacoes small {
+  color: var(--cor-texto-suave);
+  font-size: 0.75rem;
+}
+
+.gemeo-digital__secao-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.gemeo-digital__cluster {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  background: var(--cor-menta-clara);
+  color: var(--cor-dominante-escura);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.gemeo-digital__resumo {
+  margin-top: 0.65rem !important;
+  color: var(--cor-texto-suave);
+}
+
+.gemeo-digital__acoes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.gemeo-digital__acoes button,
+.chat-zelinho__sugestoes button {
+  min-height: 44px;
+  border: 1px solid rgba(47, 122, 92, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  background: #fff;
+  color: var(--cor-dominante-escura);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat-zelinho__sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chat-zelinho__sugestoes button {
+  padding-inline: 0.75rem;
+  background: var(--cor-menta-clara);
+}
+
 .lista-recomendacoes span {
   color: var(--cor-texto-suave);
   font-size: var(--tamanho-corpo-sm);
@@ -490,6 +589,53 @@
   background: var(--cor-superficie);
 }
 
+.item-agenda {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid rgba(47, 122, 92, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.item-agenda > div {
+  display: grid;
+  flex: 1;
+  gap: 0.08rem;
+}
+
+.item-agenda__icone {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--cor-menta-clara);
+  font-size: 1.2rem;
+}
+
+.agenda-vazia {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  border: 1px dashed #c9ded0;
+  border-radius: 1.1rem;
+  padding: 1.2rem 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.agenda-vazia > span {
+  font-size: 2rem;
+}
+
+.agenda-vazia p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 0.85rem;
+}
+
 .item-agenda__data,
 .dados-perfil dt {
   color: var(--cor-texto-suave);
@@ -527,6 +673,1556 @@
 .tela-interna button:focus-visible {
   outline: 3px solid var(--cor-acento);
   outline-offset: 3px;
+}
+
+/* Camada visual do produto: superfícies, ritmo e estados de interação. */
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.aplicacao-autenticada,
+.home-do-tutor {
+  background: linear-gradient(180deg, #fffdf9 0%, #f8fbf8 100%);
+}
+
+.cabecalho-zelo {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  min-height: 72px;
+  border-bottom: 1px solid rgba(47, 122, 92, 0.1);
+  background: rgba(255, 253, 249, 0.9);
+  backdrop-filter: blur(16px);
+}
+
+.marca-zelopets {
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.marca-zelopets svg {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  border-radius: 10px;
+  background: var(--cor-menta-clara);
+}
+
+.chip-zelocoins {
+  min-height: 40px;
+  border: 1px solid rgba(224, 162, 75, 0.28);
+  box-shadow: 0 4px 12px rgba(122, 75, 0, 0.08);
+}
+
+.botao-perfil {
+  min-height: 40px;
+  width: 40px;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 12px rgba(31, 90, 67, 0.14);
+}
+
+.conteudo-home {
+  gap: 1.1rem;
+  padding-top: 1rem;
+}
+
+.hero-interativo {
+  position: relative;
+  min-height: 218px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(135px, 0.9fr);
+  border-radius: 1.75rem;
+  padding: 1.4rem;
+  box-shadow: 0 16px 30px rgba(31, 90, 67, 0.14);
+}
+
+.hero-interativo__visual img {
+  animation: none;
+  border-radius: 1.2rem;
+  box-shadow: 0 10px 24px rgba(20, 54, 41, 0.2);
+  opacity: 0.95;
+}
+
+.hero-interativo__conteudo h2 {
+  max-width: 250px;
+  margin: 0;
+  font-size: clamp(1.45rem, 5vw, 2rem);
+  line-height: 1.08;
+}
+
+.hero-interativo__conteudo p {
+  max-width: 230px;
+  margin: 0;
+  color: #e6f4eb;
+  font-size: 0.9rem;
+}
+
+.hero-interativo__cta {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5rem 0.85rem;
+  background: #fff;
+  color: var(--cor-dominante-escura);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hero-interativo__controles {
+  bottom: 0.55rem;
+  right: 0.65rem;
+}
+
+.saudacao-com-pet {
+  align-items: flex-start;
+  border-radius: 1.4rem;
+  padding: 1.2rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(31, 42, 36, 0.06);
+}
+
+.saudacao-com-pet__ola {
+  color: var(--cor-dominante);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#titulo-home {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.7rem, 7vw, 2.45rem);
+  letter-spacing: -0.03em;
+}
+
+.seletor-de-pet {
+  border: 1px solid rgba(47, 122, 92, 0.16);
+  border-radius: 999px;
+  padding: 0.3rem 0.55rem 0.3rem 0.3rem;
+  background: #f8fcf8;
+}
+
+.cartao-proximo-cuidado {
+  gap: 0.7rem;
+  border: 1px solid rgba(47, 122, 92, 0.14);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e8f7ed, #f8fff9);
+  box-shadow: 0 8px 18px rgba(47, 122, 92, 0.07);
+}
+
+.lista-de-servicos h2 {
+  margin: 0 0 0.65rem;
+  font-family: var(--fonte-display);
+  font-size: 1.55rem;
+}
+
+.lista-de-servicos__itens {
+  gap: 0.65rem;
+}
+
+.linha-de-servico {
+  min-height: 72px;
+  border: 1px solid rgba(31, 42, 36, 0.06);
+  border-radius: 1.2rem;
+  padding: 0.7rem;
+  background: #fff;
+  box-shadow: 0 5px 16px rgba(31, 42, 36, 0.05);
+}
+
+.linha-de-servico__icone {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--cor-menta-clara);
+}
+
+.atalho-zelinho {
+  border: 1px solid rgba(224, 162, 75, 0.25);
+  border-radius: 1.2rem;
+  padding: 0.7rem;
+  background: linear-gradient(135deg, #fff8e9, #fffdf7);
+  box-shadow: 0 7px 18px rgba(224, 162, 75, 0.09);
+}
+
+.barra-de-navegacao {
+  border-top: 1px solid rgba(31, 42, 36, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 -8px 24px rgba(31, 42, 36, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.barra-de-navegacao__item--ativo {
+  color: var(--cor-dominante);
+}
+
+.barra-de-navegacao__item--ativo svg {
+  stroke-width: 2.7;
+}
+
+.tela-interna {
+  gap: 1.15rem;
+  padding-top: 1.25rem;
+}
+
+.tela-interna > h1 {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-family: var(--fonte-display);
+  font-size: 2.2rem;
+  letter-spacing: -0.03em;
+}
+
+.tela-interna > p.texto-apoio {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.perfil-hero {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.9rem;
+  border-radius: 1.5rem;
+  padding: 1.1rem;
+  background: linear-gradient(135deg, #e5f5e9, #fff);
+  box-shadow: 0 8px 22px rgba(47, 122, 92, 0.08);
+}
+
+.perfil-hero__avatar {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: var(--cor-acento);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  box-shadow: 0 5px 14px rgba(122, 75, 0, 0.16);
+}
+
+.perfil-hero__eyebrow {
+  color: var(--cor-dominante);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.perfil-hero h2 {
+  margin: 0.1rem 0;
+  font-family: var(--fonte-display);
+  font-size: 1.45rem;
+}
+
+.perfil-hero p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 0.85rem;
+}
+
+.lista-pets--perfil li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 0.65rem;
+}
+
+.lista-pets--perfil li > span:last-child {
+  grid-column: 2;
+  color: var(--cor-texto-suave);
+  font-size: 0.78rem;
+}
+
+.lista-pets__avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  grid-row: span 2;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--cor-acento-suave);
+  color: #7a4b00;
+  font-weight: 700;
+}
+
+.perfil-acoes {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.perfil-vazio {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 0.45rem;
+  border: 1px dashed #c9ded0;
+  border-radius: 1.2rem;
+  padding: 1.35rem 1rem;
+  background: #fbfefb;
+  text-align: center;
+}
+
+.perfil-vazio > span {
+  font-size: 2rem;
+}
+
+.perfil-vazio p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 0.85rem;
+}
+
+.botao-sair {
+  min-height: 44px;
+  margin-top: 0.5rem;
+  border: 1px solid #f0c7c3;
+  border-radius: 0.8rem;
+  background: #fff8f7;
+  color: #a23c36;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.carteira-destaque {
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  justify-content: center;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  background: radial-gradient(circle at 90% 10%, rgba(168, 230, 200, 0.55), transparent 35%), linear-gradient(135deg, #2f7a5c, #1f5a43);
+  box-shadow: 0 16px 28px rgba(31, 90, 67, 0.18);
+}
+
+.carteira-destaque__icone {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffe6aa;
+}
+
+.carteira-beneficios {
+  width: 100%;
+  border-radius: 1.35rem;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 7px 20px rgba(31, 42, 36, 0.055);
+}
+
+.carteira-beneficios__grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.carteira-beneficios__grid button {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.2rem 0.55rem;
+  border: 1px solid rgba(224, 162, 75, 0.22);
+  border-radius: 1rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #fffaf0, #fff);
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.carteira-beneficios__grid button > svg {
+  grid-row: span 2;
+  color: var(--cor-acento-escura);
+}
+
+.carteira-beneficios__grid button span,
+.carteira-beneficios__grid button small {
+  color: var(--cor-texto-suave);
+  font-size: 0.75rem;
+}
+
+.carteira-beneficios__grid button small {
+  grid-column: 3;
+  grid-row: span 2;
+  color: #7a4b00;
+  font-weight: 700;
+}
+
+.carteira-destaque strong {
+  font-size: clamp(2rem, 10vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.carteira-aviso {
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #fff7e6;
+  color: #7a4b00;
+  font-size: 0.9rem;
+}
+
+.chat-zelinho {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(47, 122, 92, 0.12);
+  border-radius: 1.5rem;
+  background: #eaf5ed;
+  box-shadow: 0 10px 26px rgba(31, 90, 67, 0.1);
+}
+
+.chat-zelinho__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 1rem;
+  background: var(--cor-dominante);
+  color: #fff;
+}
+
+.chat-zelinho__avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.chat-zelinho__avatar img {
+  width: 31px;
+  height: 31px;
+}
+
+.chat-zelinho__cabecalho strong,
+.chat-zelinho__cabecalho span {
+  display: block;
+}
+
+.chat-zelinho__cabecalho span {
+  color: #d7f0df;
+  font-size: 0.72rem;
+}
+
+.chat-zelinho__online {
+  width: 9px;
+  height: 9px;
+  margin-left: auto;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #71e39e !important;
+}
+
+.chat-zelinho__mensagens {
+  display: flex;
+  min-height: 360px;
+  max-height: 52vh;
+  flex-direction: column;
+  gap: 0.55rem;
+  overflow-y: auto;
+  padding: 1rem 0.8rem;
+  background-image: radial-gradient(rgba(47, 122, 92, 0.07) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.chat-zelinho__dia {
+  align-self: center;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--cor-texto-suave);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.mensagem-chat {
+  align-self: flex-start;
+  max-width: 82%;
+  margin: 0;
+  border-radius: 0.35rem 1rem 1rem 1rem;
+  padding: 0.55rem 0.7rem 0.35rem;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(31, 42, 36, 0.08);
+}
+
+.mensagem-chat--tutor {
+  align-self: flex-end;
+  border-radius: 1rem 0.35rem 1rem 1rem;
+  background: #d5f5df;
+}
+
+.mensagem-chat p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.mensagem-chat > span {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.2rem;
+  color: #789080;
+  font-size: 0.66rem;
+}
+
+.formulario-zelinho {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid rgba(31, 90, 67, 0.12);
+  border-radius: 999px;
+  padding: 0.35rem;
+  background: #fff;
+}
+
+.formulario-zelinho button {
+  display: grid;
+  min-width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-texto-suave);
+  cursor: pointer;
+}
+
+.formulario-zelinho input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+}
+
+.formulario-zelinho__enviar {
+  background: var(--cor-dominante) !important;
+  color: #fff !important;
+}
+
+.formulario-zelinho__enviar:disabled {
+  background: #b6c8bc !important;
+}
+
+.mascote-zelinho {
+  right: max(0.85rem, calc((100vw - 480px) / 2 + 0.85rem));
+  bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  border: 3px solid #fff;
+  box-shadow: 0 8px 20px rgba(31, 42, 36, 0.18);
+}
+
+@media (min-width: 700px) {
+  .aplicacao-autenticada,
+  .home-do-tutor {
+    width: min(100%, 560px);
+    box-shadow: 0 0 50px rgba(31, 42, 36, 0.08);
+  }
+
+  .tela-servico-completo {
+    gap: 1rem;
+  }
+
+  .servico-hero {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.9rem;
+    border-radius: 1.5rem;
+    padding: 1.15rem;
+    background: linear-gradient(135deg, #e5f5e9, #fff);
+    box-shadow: 0 8px 22px rgba(47, 122, 92, 0.08);
+  }
+
+  .servico-hero__imagem {
+    width: 76px;
+    height: 76px;
+    flex: 0 0 auto;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 6px 14px rgba(31, 42, 36, 0.12);
+  }
+
+  .beneficio-coins {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid rgba(224, 162, 75, 0.25);
+    border-radius: 1rem;
+    padding: 0.7rem 0.8rem;
+    background: linear-gradient(135deg, #fff8e9, #fff);
+    color: #7a4b00;
+    font-size: 0.78rem;
+  }
+
+  .beneficio-coins > svg:first-child {
+    flex: 0 0 auto;
+    color: var(--cor-acento-escura);
+  }
+
+  .beneficio-coins span {
+    flex: 1;
+  }
+
+  .beneficio-coins strong {
+    display: block;
+    color: var(--cor-texto);
+    font-size: 0.85rem;
+  }
+
+  .servico-hero__icone {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 18px;
+    background: var(--cor-dominante);
+    color: #fff;
+  }
+
+  .servico-hero__eyebrow {
+    color: var(--cor-dominante);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .servico-hero h2 {
+    margin: 0.1rem 0;
+    font-family: var(--fonte-display);
+    font-size: 1.55rem;
+  }
+
+  .servico-hero p {
+    margin: 0;
+    color: var(--cor-texto-suave);
+    font-size: 0.85rem;
+  }
+
+  .catalogo-servico,
+  .formulario-servico,
+  .historico-servico {
+    width: 100%;
+    border-radius: 1.35rem;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 7px 20px rgba(31, 42, 36, 0.055);
+  }
+
+  .secao-servico__titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    color: var(--cor-dominante);
+  }
+
+  .secao-servico__titulo h2,
+  .formulario-servico h2,
+  .historico-servico h2 {
+    margin: 0.1rem 0 0;
+    font-family: var(--fonte-display);
+    font-size: 1.45rem;
+    color: var(--cor-texto);
+  }
+
+  .cards-opcoes-servico {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .card-opcao-servico {
+    position: relative;
+    display: grid;
+    gap: 0.15rem;
+    border: 1px solid rgba(31, 42, 36, 0.08);
+    border-radius: 1rem;
+    padding: 0.85rem 2.2rem 0.85rem 0.9rem;
+    background: #fbfdfb;
+    color: var(--cor-texto);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .card-opcao-servico--ativo {
+    border-color: var(--cor-dominante);
+    background: #f0faf3;
+    box-shadow: 0 0 0 2px rgba(47, 122, 92, 0.1);
+  }
+
+  .card-opcao-servico strong {
+    font-size: 1rem;
+  }
+
+  .card-opcao-servico > span:not(.card-opcao-servico__check) {
+    color: var(--cor-texto-suave);
+    font-size: 0.8rem;
+  }
+
+  .card-opcao-servico b {
+    margin-top: 0.35rem;
+    color: var(--cor-dominante-escura);
+  }
+
+  .card-opcao-servico small {
+    color: var(--cor-texto-suave);
+    font-weight: 500;
+  }
+
+  .card-opcao-servico__check {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.8rem;
+    color: var(--cor-dominante);
+  }
+
+  .formulario-servico h2,
+  .historico-servico h2 {
+    margin-bottom: 0.85rem;
+  }
+
+  .formulario-servico form {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .campo-servico {
+    display: grid;
+    gap: 0.35rem;
+    color: var(--cor-texto-suave);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .campo-servico input,
+  .campo-servico select {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid #d5e4d9;
+    border-radius: 0.75rem;
+    padding: 0 0.7rem;
+    background: #fbfdfb;
+    color: var(--cor-texto);
+    font: inherit;
+  }
+
+  .campo-servico__controle {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--cor-dominante);
+  }
+
+  .campo-servico__controle input,
+  .campo-servico__controle select {
+    flex: 1;
+  }
+
+  .grade-campos-servico {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .resumo-servico {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0.9rem;
+    padding: 0.8rem;
+    background: var(--cor-menta-clara);
+    color: var(--cor-dominante-escura);
+  }
+
+  .resumo-servico strong {
+    font-size: 1.1rem;
+  }
+
+  .resumo-servico > strong {
+    font-size: 1.35rem;
+  }
+
+  .estado-servico {
+    width: 100%;
+    border-radius: 0.9rem;
+    padding: 1rem;
+    background: #fff;
+    color: var(--cor-texto-suave);
+  }
+
+  .historico-servico ul {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .historico-servico li {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    border-top: 1px solid #edf2ee;
+    padding-top: 0.7rem;
+  }
+
+  .historico-servico li > div:first-child {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    gap: 0.15rem;
+  }
+
+  .historico-servico li strong,
+  .historico-servico li span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .historico-servico li span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--cor-texto-suave);
+    font-size: 0.75rem;
+  }
+
+  .historico-servico li b {
+    color: var(--cor-dominante-escura);
+    font-size: 0.8rem;
+  }
+
+  .historico-servico li > button,
+  .historico-servico__acoes button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    border: 0;
+    border-radius: 0.6rem;
+    padding: 0.45rem;
+    background: #fff0ef;
+    color: #a23c36;
+    font: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+
+  .historico-servico__acoes {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .historico-servico__acoes button:first-child {
+    background: var(--cor-acento-suave);
+    color: #7a4b00;
+  }
+
+  .mobilidade-capa {
+    position: relative;
+    display: flex;
+    min-height: 130px;
+    align-items: flex-end;
+    overflow: hidden;
+    width: 100%;
+    border-radius: 1.35rem;
+    background: var(--cor-dominante);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(31, 90, 67, 0.15);
+  }
+
+  .mobilidade-capa img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.58;
+  }
+
+  .mobilidade-capa div {
+    position: relative;
+    z-index: 1;
+    max-width: 82%;
+    padding: 1rem;
+    background: linear-gradient(90deg, rgba(31, 90, 67, 0.92), transparent);
+  }
+
+  .mobilidade-capa span {
+    font-family: var(--fonte-display);
+    font-size: 1.25rem;
+  }
+
+  .mobilidade-capa p {
+    margin: 0.25rem 0 0;
+    color: #e6f4eb;
+    font-size: 0.8rem;
+  }
+
+  .tela-cadastro-do-pet {
+    position: relative;
+    gap: 1.15rem;
+    padding-top: 1.25rem;
+    background:
+      radial-gradient(circle at 90% 5%, rgba(251, 235, 203, 0.7), transparent 16rem),
+      linear-gradient(180deg, #fffdf8, #f3faf5);
+  }
+
+  .cadastro-pet__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--cor-dominante);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .tela-cadastro-do-pet h1 {
+    margin: 0;
+    font-size: 2.25rem;
+    letter-spacing: -0.035em;
+  }
+
+  .cadastro-pet__intro {
+    margin: -0.55rem 0 0;
+    color: var(--cor-texto-suave);
+  }
+
+  .tela-cadastro-do-pet .escolha-de-retrato,
+  .tela-cadastro-do-pet .campos-essenciais,
+  .tela-cadastro-do-pet .detalhes-opcionais {
+    width: 100%;
+    border: 1px solid rgba(47, 122, 92, 0.1);
+    border-radius: 1.25rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 7px 20px rgba(31, 42, 36, 0.05);
+  }
+
+  @media (max-width: 380px) {
+    .grade-campos-servico {
+      grid-template-columns: 1fr;
+    }
+
+    /* Cadastro do pet: seleção visual, acessível e sem controles nativos expostos. */
+    .tela-cadastro-do-pet {
+      overflow: hidden;
+    }
+
+    .tela-cadastro-do-pet h1 {
+      max-width: 620px;
+    }
+
+    .escolha-de-retrato,
+    .campos-essenciais,
+    .detalhes-opcionais {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .cadastro-secao__titulo {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .cadastro-secao__icone {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--cor-menta-clara);
+      color: var(--cor-dominante);
+    }
+
+    .cadastro-secao__eyebrow {
+      display: block;
+      color: var(--cor-dominante);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .cadastro-secao__titulo h2 {
+      margin: 0.1rem 0 0;
+      font-family: var(--fonte-display);
+      font-size: 1.35rem;
+    }
+
+    .cadastro-secao__apoio {
+      margin: -0.3rem 0 0;
+      color: var(--cor-texto-suave);
+      font-size: 0.83rem;
+    }
+
+    .galeria-de-racas {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .galeria-de-racas__item {
+      position: relative;
+      display: grid;
+      min-height: 126px;
+      align-content: end;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 1rem;
+      padding: 0;
+      background: var(--cor-dominante-escura);
+      color: #fff;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      isolation: isolate;
+    }
+
+    .galeria-de-racas__item::after {
+      position: absolute;
+      inset: 42% 0 0;
+      z-index: -1;
+      background: linear-gradient(transparent, rgba(20, 54, 41, 0.9));
+      content: '';
+    }
+
+    .galeria-de-racas__item img {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.86;
+      transition: transform 240ms ease;
+    }
+
+    .galeria-de-racas__item:hover img,
+    .galeria-de-racas__item--selecionado img {
+      transform: scale(1.06);
+    }
+
+    .galeria-de-racas__item span {
+      padding: 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .galeria-de-racas__item svg {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      color: #ffe6aa;
+    }
+
+    .galeria-de-racas__item--selecionado {
+      border-color: var(--cor-acento);
+      box-shadow: 0 0 0 3px rgba(224, 162, 75, 0.2);
+    }
+
+    .botao-adicionar-foto-real {
+      position: relative;
+      display: grid;
+      min-height: 88px;
+      justify-items: center;
+      align-content: center;
+      gap: 0.2rem;
+      overflow: hidden;
+      border: 1.5px dashed #9bc5aa;
+      border-radius: 1rem;
+      padding: 0.7rem;
+      background: #f5fcf6;
+      color: var(--cor-dominante-escura);
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .botao-adicionar-foto-real strong {
+      font-size: 0.9rem;
+    }
+
+    .botao-adicionar-foto-real > span {
+      color: var(--cor-texto-suave);
+      font-size: 0.72rem;
+    }
+
+    .botao-adicionar-foto-real input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      opacity: 0;
+    }
+
+    .botao-adicionar-foto-real__preview {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .campos-essenciais {
+      gap: 1.1rem;
+    }
+
+    .campo-cadastro {
+      display: grid;
+      gap: 0.35rem;
+      color: var(--cor-texto);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .campo-cadastro > span,
+    .campos-essenciais legend {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--cor-texto-suave);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .campo-cadastro > span svg,
+    .campos-essenciais legend svg {
+      color: var(--cor-dominante);
+    }
+
+    .campo-cadastro input,
+    .campos-essenciais input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid #cfe1d4;
+      border-radius: 0.85rem;
+      padding: 0 0.85rem;
+      background: #fcfffc;
+      color: var(--cor-texto);
+      font: inherit;
+      outline: 0;
+    }
+
+    .campo-cadastro input:focus,
+    .campos-essenciais input:focus {
+      border-color: var(--cor-dominante);
+      box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.12);
+    }
+
+    .campos-essenciais fieldset {
+      display: grid;
+      gap: 0.55rem;
+      margin: 0;
+      border: 0;
+      padding: 0;
+    }
+
+    .opcoes-cadastro {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    .opcoes-cadastro button {
+      display: grid;
+      min-height: 88px;
+      justify-items: center;
+      align-content: center;
+      gap: 0.15rem;
+      border: 1px solid #d5e5d9;
+      border-radius: 0.9rem;
+      padding: 0.45rem 0.2rem;
+      background: #fbfefb;
+      color: var(--cor-texto);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .opcoes-cadastro button svg {
+      color: var(--cor-dominante);
+    }
+
+    .opcoes-cadastro button strong {
+      font-size: 0.78rem;
+    }
+
+    .opcoes-cadastro button span {
+      color: var(--cor-texto-suave);
+      font-size: 0.63rem;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .opcoes-cadastro button[aria-pressed='true'] {
+      border-color: var(--cor-dominante);
+      background: var(--cor-menta-clara);
+      box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.1);
+    }
+
+    .detalhes-opcionais__toggle {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 0.65rem;
+      border: 0;
+      background: transparent;
+      color: var(--cor-texto);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .detalhes-opcionais__toggle > span:nth-child(2) {
+      display: grid;
+      flex: 1;
+      gap: 0.1rem;
+    }
+
+    .detalhes-opcionais__toggle small {
+      color: var(--cor-texto-suave);
+      font-size: 0.72rem;
+    }
+
+    .detalhes-opcionais__chevron--aberto {
+      transform: rotate(180deg);
+    }
+
+    .detalhes-opcionais__conteudo {
+      display: grid;
+      gap: 0.8rem;
+      border-top: 1px solid #e4eee6;
+      padding-top: 0.9rem;
+    }
+
+    .botao-criar-gemeo-digital-wrapper {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .botao-criar-gemeo-digital {
+      min-height: 54px;
+      border: 0;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, var(--cor-acento), #efbd66);
+      color: #503100;
+      font: inherit;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(224, 162, 75, 0.23);
+      cursor: pointer;
+    }
+
+    .botao-criar-gemeo-digital:disabled {
+      background: #d7e3da;
+      color: #76847a;
+      box-shadow: none;
+    }
+
+    /* Ajuste final da seleção de raças: cards compactos, imagens reais e marcação explícita. */
+    .tela-cadastro-do-pet .galeria-de-racas {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item {
+      display: grid;
+      min-height: 112px;
+      grid-template-rows: 1fr auto;
+      align-content: stretch;
+      border: 2px solid #dfece2;
+      border-radius: 0.9rem;
+      background: #fff;
+      color: var(--cor-texto);
+      box-shadow: 0 3px 10px rgba(31, 42, 36, 0.05);
+      isolation: initial;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item::after {
+      display: none;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item img {
+      position: static;
+      width: 100%;
+      height: 76px;
+      min-height: 0;
+      border-radius: 0.75rem 0.75rem 0 0;
+      object-fit: cover;
+      object-position: center 35%;
+      opacity: 1;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item > span:not(.galeria-de-racas__check) {
+      display: block;
+      overflow: hidden;
+      padding: 0.45rem 0.55rem;
+      color: var(--cor-texto);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item:hover {
+      border-color: var(--cor-dominante);
+      background: #f5fbf6;
+      transform: translateY(-1px);
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item--selecionado {
+      border-color: var(--cor-dominante);
+      background: var(--cor-menta-clara);
+      box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.16);
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item--selecionado > span:not(.galeria-de-racas__check) {
+      color: var(--cor-dominante-escura);
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__check {
+      position: absolute;
+      top: 0.45rem;
+      right: 0.45rem;
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: var(--cor-dominante);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(31, 90, 67, 0.2);
+    }
+
+    .tela-cadastro-do-pet .botao-adicionar-foto-real {
+      min-height: 76px;
+      border-color: var(--cor-dominante);
+      background: var(--cor-menta-clara);
+      color: var(--cor-dominante-escura);
+    }
+
+    .tela-cadastro-do-pet .botao-adicionar-foto-real:hover {
+      border-color: var(--cor-dominante-escura);
+      background: #d7efdf;
+    }
+
+    .tela-cadastro-do-pet .botao-adicionar-foto-real input {
+      appearance: none;
+      font-size: 0;
+    }
+
+    .tela-cadastro-do-pet .opcoes-cadastro button {
+      border-color: #dfece2;
+      background: #fff;
+      color: var(--cor-texto);
+    }
+
+    .tela-cadastro-do-pet .opcoes-cadastro button:hover,
+    .tela-cadastro-do-pet .opcoes-cadastro button[aria-pressed='true'] {
+      border-color: var(--cor-dominante);
+      background: var(--cor-menta-clara);
+      color: var(--cor-dominante-escura);
+    }
+
+    .tela-cadastro-do-pet .botao-criar-gemeo-digital {
+      background: var(--cor-acento);
+      color: var(--cor-texto);
+    }
+
+    .tela-cadastro-do-pet .botao-criar-gemeo-digital:hover:not(:disabled) {
+      background: var(--cor-acento-escura);
+      color: #fff;
+    }
+
+    @media (min-width: 600px) {
+      .tela-cadastro-do-pet .galeria-de-racas {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    /* Correção de cascata: estes estilos ficam por último para impedir que os
+       controles nativos e as regras antigas do formulário reapareçam. */
+    .tela-cadastro-do-pet .escolha-de-retrato,
+    .tela-cadastro-do-pet .campos-essenciais,
+    .tela-cadastro-do-pet .detalhes-opcionais {
+      display: grid !important;
+      border: 1px solid #dfece2 !important;
+      border-radius: 1.15rem !important;
+      padding: 1rem !important;
+      background: #fff !important;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.6rem !important;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item {
+      display: grid !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      min-height: 100px !important;
+      grid-template-rows: 62px auto !important;
+      align-content: stretch !important;
+      overflow: hidden !important;
+      border: 2px solid #dfece2 !important;
+      border-radius: 0.85rem !important;
+      padding: 0 !important;
+      background: #fff !important;
+      box-shadow: none !important;
+      color: var(--cor-texto) !important;
+      font: inherit !important;
+      transform: none !important;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item img {
+      position: static !important;
+      width: 100% !important;
+      height: 62px !important;
+      min-height: 62px !important;
+      border-radius: 0 !important;
+      object-fit: cover !important;
+      object-position: center 32% !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item > span:not(.galeria-de-racas__check) {
+      display: flex !important;
+      min-width: 0 !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      padding: 0.35rem !important;
+      color: var(--cor-texto) !important;
+      font-size: 0.72rem !important;
+      font-weight: 700 !important;
+      text-align: center !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__item--selecionado,
+    .tela-cadastro-do-pet .galeria-de-racas__item[aria-pressed='true'] {
+      border-color: var(--cor-dominante) !important;
+      background: var(--cor-menta-clara) !important;
+      box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.16) !important;
+    }
+
+    .tela-cadastro-do-pet .galeria-de-racas__check {
+      position: absolute !important;
+      top: 0.35rem !important;
+      right: 0.35rem !important;
+      display: grid !important;
+      width: 22px !important;
+      height: 22px !important;
+      place-items: center !important;
+      border: 2px solid #fff !important;
+      border-radius: 50% !important;
+      background: var(--cor-dominante) !important;
+      color: #fff !important;
+    }
+
+    .tela-cadastro-do-pet .botao-adicionar-foto-real {
+      display: grid !important;
+      min-height: 68px !important;
+      border: 1px dashed var(--cor-dominante) !important;
+      border-radius: 0.9rem !important;
+      background: var(--cor-menta-clara) !important;
+    }
+
+    .tela-cadastro-do-pet .botao-adicionar-foto-real input {
+      display: none !important;
+    }
+
+    .tela-cadastro-do-pet .campos-essenciais fieldset {
+      display: grid !important;
+      gap: 0.55rem !important;
+      margin: 0 !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+
+    .tela-cadastro-do-pet .opcoes-cadastro {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 0.5rem !important;
+    }
+
+    .tela-cadastro-do-pet .opcoes-cadastro button {
+      display: grid !important;
+      min-width: 0 !important;
+      min-height: 82px !important;
+      align-content: center !important;
+      justify-items: center !important;
+      gap: 0.15rem !important;
+      border: 1px solid #dfece2 !important;
+      border-radius: 0.8rem !important;
+      padding: 0.35rem 0.2rem !important;
+      background: #fff !important;
+      color: var(--cor-texto) !important;
+      font: inherit !important;
+      cursor: pointer !important;
+    }
+
+    .tela-cadastro-do-pet .opcoes-cadastro button[aria-pressed='true'] {
+      border-color: var(--cor-dominante) !important;
+      background: var(--cor-menta-clara) !important;
+      color: var(--cor-dominante-escura) !important;
+      box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.12) !important;
+    }
+
+    .tela-cadastro-do-pet .detalhes-opcionais__toggle {
+      border: 0 !important;
+      background: transparent !important;
+      color: var(--cor-texto) !important;
+      font: inherit !important;
+    }
+
+    @media (min-width: 600px) {
+      .tela-cadastro-do-pet .galeria-de-racas {
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      }
+    }
+
+    .historico-servico li {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+  }
 }
 
 .cabecalho-zelo {

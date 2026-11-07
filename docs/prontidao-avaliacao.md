@@ -25,9 +25,9 @@ concluída na demonstração.
 | Axe em Home e Mobilidade | 0 violações registradas em `docs/validacao-bloco2.md` | Atendido nessas duas telas |
 | Lighthouse Snapshot autenticado | Não foi possível obter relatório local | Pendente do dono |
 | Fluxo completo somente por teclado | Foco e duração verificados; `datetime-local` não permitiu confirmar envio | Pendente do dono |
-| Área administrativa e papéis | Não existe módulo/guard administrativo | Pendente |
+| Área administrativa e papéis | `src/atendimento/`, `AdminGuard`, seed admin opcional e tela de Atendimentos | Atendido nesta rodada |
 | Filtros e ordenação de vitrine/agenda | Ainda não há requisito implementado em todas as telas | Pendente |
-| Chatbot Zelinho com NLU avaliado | Motor local ativo; bateria formal Q3/Q4 ainda não foi executada | Parcial |
+| Chatbot Zelinho com NLU avaliado | Demo 10/10, smoke 30/30 e 37 testes Python; métricas estatísticas documentadas | Atendido com limitações documentadas |
 | Recuperação de senha, Google login e avatar persistido | Não são fluxos completos no código atual | Pendente |
 | Testes em navegadores reais | Não executados pelo agente | Pendente do dono |
 
@@ -42,7 +42,8 @@ concluída na demonstração.
    `pnpm --dir frontend build` e o pytest dentro de `ml-service`.
 5. Para recomendações, execute o seed ML e retreine o modelo antes de iniciar
    o microsserviço.
-6. Faça manualmente o Lighthouse Snapshot e o teste de teclado, pois dependem
+6. Para criar o admin demo, defina `ADMIN_DEMO_PASSWORD` antes do seed.
+7. Faça manualmente o Lighthouse Snapshot e o teste de teclado, pois dependem
    da sessão autenticada e dos controles nativos do Chrome.
 
 ## Decisões do chatbot

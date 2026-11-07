@@ -121,9 +121,29 @@ async function seedDemo() {
   console.log(`Demo criada — login no Swagger com ${emailDemo} / demo1234`);
 }
 
+async function seedAdmin() {
+  const senha = process.env.ADMIN_DEMO_PASSWORD;
+  if (!senha) {
+    console.log('Admin demo não criado — defina ADMIN_DEMO_PASSWORD para habilitá-lo.');
+    return;
+  }
+  const senhaHash = await bcrypt.hash(senha, 10);
+  await prisma.tutor.upsert({
+    where: { email: 'admin@demo.zelopets.local' },
+    update: { nome: 'Admin Demo', senhaHash, papel: 'ADMIN' },
+    create: {
+      nome: 'Admin Demo',
+      email: 'admin@demo.zelopets.local',
+      senhaHash,
+      papel: 'ADMIN',
+    },
+  });
+}
+
 async function main() {
   await seedCatalogo();
   await seedDemo();
+  await seedAdmin();
   console.log('Seed concluído.');
 }
 

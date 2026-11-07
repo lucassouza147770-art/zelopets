@@ -1,0 +1,329 @@
+.tela-cadastro-do-pet {
+  width: min(100% - 2rem, 640px) !important;
+  max-width: 640px !important;
+  margin: 0 auto !important;
+  overflow-x: hidden !important;
+}
+
+.tela-cadastro-do-pet .escolha-de-retrato,
+.tela-cadastro-do-pet .campos-essenciais,
+.tela-cadastro-do-pet .detalhes-opcionais {
+  display: grid !important;
+  width: 100% !important;
+  gap: 1rem !important;
+  border: 1px solid #dfece2 !important;
+  border-radius: 1.15rem !important;
+  padding: 1rem !important;
+  background: #fff !important;
+  box-shadow: 0 8px 20px rgba(31, 42, 36, 0.06) !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas {
+  display: grid !important;
+  width: 100% !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.6rem !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item {
+  position: relative !important;
+  display: grid !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 108px !important;
+  min-height: 108px !important;
+  grid-template-rows: 72px 36px !important;
+  overflow: hidden !important;
+  border: 2px solid #dfece2 !important;
+  border-radius: 0.85rem !important;
+  padding: 0 !important;
+  background: #fff !important;
+  color: #1f2a24 !important;
+  font: inherit !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transform: none !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item::after {
+  display: none !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item img {
+  position: static !important;
+  display: block !important;
+  width: 100% !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: center 24% !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item[data-raca='bulldog'] img,
+.tela-cadastro-do-pet .galeria-de-racas__item[data-raca='salsicha'] img {
+  object-position: center 30% !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item[data-raca='shih-tzu'] img,
+.tela-cadastro-do-pet .galeria-de-racas__item[data-raca='poodle'] img {
+  object-position: center 20% !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item > span:not(.galeria-de-racas__check) {
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  padding: 0 0.35rem !important;
+  color: #1f2a24 !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item[aria-pressed='true'] {
+  border-color: #2f7a5c !important;
+  background: #e4f3ea !important;
+  box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.2) !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__item[aria-pressed='true'] > span:not(.galeria-de-racas__check) {
+  color: #1f5a43 !important;
+}
+
+.tela-cadastro-do-pet .galeria-de-racas__check {
+  position: absolute !important;
+  top: 0.4rem !important;
+  right: 0.4rem !important;
+  display: grid !important;
+  width: 23px !important;
+  height: 23px !important;
+  place-items: center !important;
+  border: 2px solid #fff !important;
+  border-radius: 50% !important;
+  background: #2f7a5c !important;
+  color: #fff !important;
+}
+
+.tela-cadastro-do-pet .botao-adicionar-foto-real {
+  position: relative !important;
+  display: grid !important;
+  min-height: 72px !important;
+  justify-items: center !important;
+  align-content: center !important;
+  gap: 0.15rem !important;
+  overflow: hidden !important;
+  border: 1px dashed #2f7a5c !important;
+  border-radius: 0.9rem !important;
+  padding: 0.5rem !important;
+  background: #e4f3ea !important;
+  color: #1f5a43 !important;
+  cursor: pointer !important;
+}
+
+.tela-cadastro-do-pet .botao-adicionar-foto-real input[type='file'] {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: pointer !important;
+  opacity: 0 !important;
+}
+
+.tela-cadastro-do-pet .botao-adicionar-foto-real strong {
+  font-size: 0.85rem !important;
+}
+
+.tela-cadastro-do-pet .botao-adicionar-foto-real > span {
+  color: #55625a !important;
+  font-size: 0.7rem !important;
+}
+
+.tela-cadastro-do-pet .campos-essenciais fieldset {
+  display: grid !important;
+  gap: 0.5rem !important;
+  margin: 0 !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+.tela-cadastro-do-pet .campo-cadastro {
+  display: grid !important;
+  gap: 0.45rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.tela-cadastro-do-pet .campo-cadastro > span {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  color: #1f5a43 !important;
+  font-size: 0.9rem !important;
+  font-weight: 750 !important;
+}
+
+.tela-cadastro-do-pet .campo-cadastro > small {
+  margin-top: -0.15rem !important;
+  color: #748278 !important;
+  font-size: 0.78rem !important;
+}
+
+.tela-cadastro-do-pet .campo-cadastro input {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  border: 1.5px solid #cfe2d4 !important;
+  border-radius: 0.85rem !important;
+  padding: 0.8rem 0.95rem !important;
+  outline: none !important;
+  background: #fbfdfb !important;
+  color: #1f2a24 !important;
+  font: inherit !important;
+  font-size: 0.95rem !important;
+}
+
+.tela-cadastro-do-pet .campo-cadastro input::placeholder {
+  color: #9aa79e !important;
+}
+
+.tela-cadastro-do-pet .campo-cadastro input:focus {
+  border-color: #2f7a5c !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.14) !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais {
+  gap: 0 !important;
+  padding: 0.7rem !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle {
+  display: grid !important;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 64px !important;
+  gap: 0.7rem !important;
+  border: 0 !important;
+  border-radius: 0.85rem !important;
+  padding: 0.55rem 0.65rem !important;
+  background: #f3f8f4 !important;
+  color: #1f5a43 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle .cadastro-secao__icone {
+  display: grid !important;
+  width: 2.4rem !important;
+  height: 2.4rem !important;
+  place-items: center !important;
+  border-radius: 0.75rem !important;
+  background: #dcefe2 !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle > span:nth-child(2) {
+  display: grid !important;
+  gap: 0.18rem !important;
+  min-width: 0 !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle strong {
+  font-size: 0.95rem !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle small {
+  color: #748278 !important;
+  font-size: 0.76rem !important;
+  line-height: 1.25 !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle > svg:last-child {
+  transition: transform 160ms ease !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__toggle > .detalhes-opcionais__chevron--aberto {
+  transform: rotate(180deg) !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__conteudo {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+  padding: 1.1rem 0.35rem 0.35rem !important;
+}
+
+.tela-cadastro-do-pet .detalhes-opcionais__conteudo .campo-cadastro:last-child {
+  grid-column: 1 / -1 !important;
+}
+
+.tela-cadastro-do-pet .opcoes-cadastro {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0.5rem !important;
+}
+
+.tela-cadastro-do-pet .opcoes-cadastro button {
+  display: grid !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 82px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 0.15rem !important;
+  border: 1px solid #dfece2 !important;
+  border-radius: 0.8rem !important;
+  padding: 0.35rem 0.15rem !important;
+  background: #fff !important;
+  color: #1f2a24 !important;
+  font: inherit !important;
+  cursor: pointer !important;
+  transform: none !important;
+}
+
+.tela-cadastro-do-pet .opcoes-cadastro button[aria-pressed='true'] {
+  border-color: #2f7a5c !important;
+  background: #e4f3ea !important;
+  color: #1f5a43 !important;
+  box-shadow: 0 0 0 3px rgba(47, 122, 92, 0.14) !important;
+}
+
+.tela-cadastro-do-pet .botao-criar-gemeo-digital {
+  min-height: 52px !important;
+  border: 0 !important;
+  border-radius: 0.9rem !important;
+  background: #e0a24b !important;
+  color: #1f2a24 !important;
+  font-weight: 700 !important;
+}
+
+.tela-cadastro-do-pet .botao-criar-gemeo-digital:disabled {
+  background: #d7e3da !important;
+  color: #76847a !important;
+}
+
+@media (min-width: 600px) {
+  .tela-cadastro-do-pet .galeria-de-racas {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  @media (max-width: 599px) {
+    .tela-cadastro-do-pet .detalhes-opcionais__conteudo {
+      grid-template-columns: 1fr !important;
+    }
+
+    .tela-cadastro-do-pet .detalhes-opcionais__conteudo .campo-cadastro:last-child {
+      grid-column: auto !important;
+    }
+  }
+}

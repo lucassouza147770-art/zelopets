@@ -46,7 +46,11 @@ app.include_router(chatbot_router)
 
 @app.get("/health")
 def health() -> dict[str, bool | str]:
-    return {"status": "ok", "modelo_carregado": _modelo is not None}
+    return {
+        "status": "ok",
+        "modelo_carregado": _modelo is not None,
+        "modelo_versao": "kmeans-v2" if _modelo is not None else "ausente",
+    }
 
 
 @app.get("/recommend/{user_id}")

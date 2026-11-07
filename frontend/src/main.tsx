@@ -5,6 +5,7 @@ import './styles/tipografia.css'
 import './styles/cores.css'
 import './styles/responsivo.css'
 import './styles/movimento.css'
+import './styles/cadastro-pet.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
