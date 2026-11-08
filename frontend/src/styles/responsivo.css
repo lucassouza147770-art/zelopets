@@ -354,6 +354,60 @@
   gap: 1rem;
 }
 
+.gemeo-digital__seletor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(47, 122, 92, 0.16);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background: var(--cor-superficie);
+}
+
+.gemeo-digital__seletor h2 {
+  margin: 0;
+  font-family: var(--fonte-corpo);
+  font-size: 1.05rem;
+}
+
+.gemeo-digital__pets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.gemeo-digital__pet {
+  display: inline-flex;
+  min-width: 76px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(47, 122, 92, 0.2);
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  background: #fff;
+  color: var(--cor-dominante-escura);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gemeo-digital__pet img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.gemeo-digital__pet--ativo {
+  border-color: var(--cor-dominante);
+  background: var(--cor-menta-clara);
+  box-shadow: 0 0 0 2px rgba(47, 122, 92, 0.12);
+}
+
 .gemeo-digital__identidade,
 .gemeo-digital__dados,
 .gemeo-digital__recomendacoes {

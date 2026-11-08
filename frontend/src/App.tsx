@@ -239,6 +239,7 @@ function TelaGemeoDigital({
   onVoltar: () => void
   onAbrirServico: (servico: ServicoId) => void
 }) {
+  const [pets, setPets] = useState<PetDetalhado[]>([])
   const [pet, setPet] = useState<PetDetalhado | null>(null)
   const [recomendacoes, setRecomendacoes] = useState<RespostaRecomendacao | null>(null)
   const [estado, setEstado] = useState<'carregando' | 'ok' | 'erro'>('carregando')
@@ -252,6 +253,7 @@ function TelaGemeoDigital({
         if (!selecionado) throw new Error('Nenhum pet cadastrado')
         const resultado = await obterRecomendacoes(token, selecionado.id).catch(() => null)
         if (!ativa) return
+        setPets(pets)
         setPet(selecionado)
         setRecomendacoes(resultado)
         setEstado('ok')
@@ -269,6 +271,13 @@ function TelaGemeoDigital({
     }
   }, [onSessaoExpirada, token])
 
+  async function selecionarPet(selecionado: PetDetalhado) {
+    setPet(selecionado)
+    setMensagem(null)
+    const resultado = await obterRecomendacoes(token, selecionado.id).catch(() => null)
+    setRecomendacoes(resultado)
+  }
+
   return (
     <TelaInterna titulo="Gêmeo digital" onVoltar={onVoltar}>
       {estado === 'carregando' ? (
@@ -277,6 +286,29 @@ function TelaGemeoDigital({
         <p role="alert">Não foi possível carregar o perfil do seu cão.</p>
       ) : (
         <div className="gemeo-digital">
+          {pets.length > 1 && (
+            <section aria-labelledby="seletor-gemeo" className="gemeo-digital__seletor">
+              <div>
+                <p className="texto-apoio">Você tem mais de um cão</p>
+                <h2 id="seletor-gemeo">Qual perfil você quer ver?</h2>
+              </div>
+              <div className="gemeo-digital__pets" role="tablist" aria-label="Perfis dos cães">
+                {pets.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={pet.id === item.id}
+                    className={pet.id === item.id ? 'gemeo-digital__pet gemeo-digital__pet--ativo' : 'gemeo-digital__pet'}
+                    onClick={() => void selecionarPet(item)}
+                  >
+                    {item.fotoUrl ? <img src={item.fotoUrl} alt="" /> : item.nome.charAt(0).toUpperCase()}
+                    <span>{item.nome}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
           <section className="gemeo-digital__identidade" aria-labelledby="nome-gemeo">
             <div className="gemeo-digital__foto">
               {pet.fotoUrl ? <img src={pet.fotoUrl} alt="" /> : pet.nome.charAt(0).toUpperCase()}
