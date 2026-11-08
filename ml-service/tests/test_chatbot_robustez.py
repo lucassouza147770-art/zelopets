@@ -10,7 +10,7 @@ from chatbot.nlu import classificar
         ("qto custa o transporte do meu cao?", "precos_mobilidade"),
         ("preciso levar meu cachorru", "pedir_transporte"),
         ("hotel premium pra hospedar meu pet", "reservar_hotel"),
-        ("qual o preco da diaria do hotel", "reservar_hotel"),
+        ("qual o preco da diaria do hotel", "pacotes_precos_hotel"),
         ("quero pausar minha assinatura de racao", "pausar_cancelar"),
         ("quando chega minha proxima racao", "previsao_racao"),
         ("como ganho zelocoins", "saldo_moedas"),

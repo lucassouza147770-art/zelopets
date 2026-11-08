@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -10,7 +10,20 @@ async function bootstrap() {
     .map((origin) => origin.trim())
     .filter(Boolean);
   app.enableCors({ origin: allowedOrigins });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    stopAtFirstError: false,
+    exceptionFactory: (errors) => {
+      const mensagens = errors.flatMap((erro) =>
+        Object.values(erro.constraints ?? {}),
+      );
+      return new BadRequestException({
+        message: mensagens.length > 0 ? mensagens : ['Confira os campos obrigatórios'],
+        campos: errors.map((erro) => erro.property),
+      });
+    },
+  }));
   const config = new DocumentBuilder()
     .setTitle('ZeloPets API')
     .setDescription('Auth, Pets, Prestadores, Passeios, Hospedagens e Assinaturas')

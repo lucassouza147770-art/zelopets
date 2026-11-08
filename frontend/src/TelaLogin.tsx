@@ -13,6 +13,16 @@ export function TelaLogin({ onAutenticado }: { onAutenticado: () => void }) {
   const [mensagemErro, setMensagemErro] = useState<string | null>(null)
 
   async function handleEnviar() {
+    const faltantes = [
+      ...(modo === 'registro' && !nome.trim() ? ['Nome'] : []),
+      ...(!email.trim() ? ['E-mail'] : []),
+      ...(!senha ? ['Senha'] : []),
+    ]
+    if (faltantes.length > 0) {
+      setEstado('erro')
+      setMensagemErro(`Preencha os campos obrigatórios: ${faltantes.join(', ')}.`)
+      return
+    }
     setEstado('enviando')
     setMensagemErro(null)
     try {
@@ -36,19 +46,20 @@ export function TelaLogin({ onAutenticado }: { onAutenticado: () => void }) {
       </div>
       <p className="login-eyebrow">{modo === 'login' ? 'Cuidado que acompanha vocês' : 'Comece o perfil do seu pet'}</p>
       <h1>{modo === 'login' ? 'Bem-vindo de volta!' : 'Crie uma conta conosco!'}</h1>
+      <p className="login-nota">Campos com * são obrigatórios.</p>
       {modo === 'registro' && (
         <label>
-          Nome
-          <input value={nome} onChange={(e) => setNome(e.target.value)} />
+          Nome *
+          <input required aria-required="true" value={nome} onChange={(e) => setNome(e.target.value)} />
         </label>
       )}
       <label>
-        E-mail
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        E-mail *
+        <input required aria-required="true" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
       <label>
-        Senha
-        <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+        Senha * <small>(mínimo de 6 caracteres no cadastro)</small>
+        <input required aria-required="true" minLength={modo === 'registro' ? 6 : undefined} type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
       </label>
       {estado === 'erro' && mensagemErro && <p className="tela-login__erro">{mensagemErro}</p>}
       <button className="login-cta" type="button" onClick={handleEnviar} disabled={estado === 'enviando'}>

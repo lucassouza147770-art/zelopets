@@ -8,6 +8,11 @@ intenção, confiança, sugestões, confirmação ou handoff. O serviço Python
 mantém o estado curto da conversa e aplica regras de alta precisão antes do
 modelo estatístico.
 
+O Nest também mantém o estado temporário de agendamento: identifica o serviço,
+pergunta o pet quando há mais de um, coleta data e horário, confirma antes de
+gravar e oferece `Ver na agenda`. Perguntas de catálogo, planos, saldo e
+agenda são respondidas com dados atuais do banco.
+
 Chamados são persistidos em `AtendimentoHumano`. O tutor consulta
 `/zelinho/atendimento/atual`; a equipe admin usa `/atendimentos` para listar e
 alterar status.

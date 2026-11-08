@@ -60,7 +60,7 @@ REGRAS = [
     (r"\b(saldo|moedas|zelocoins|carteira|ganhar).*\b", "saldo_moedas"),
     (r"\b(passeio|caminhada).*(agendar|marcar|amanha)\b", "agendar_passeio"),
     (r"\b(hotel|hospedar|diaria).*(reserv|hospedar|preco)\b", "reservar_hotel"),
-    (r"\b(preco|valor|custa).*(diaria|hotel)\b", "reservar_hotel"),
+    (r"\b(preco|valor|custa).*(diaria|hotel)\b", "pacotes_precos_hotel"),
     (r"\b(essencial|conforto|premium).*(hotel|pacote|diaria)\b", "pacotes_precos_hotel"),
     (r"\b(hotel|hospedar).*(essencial|conforto|premium)\b", "reservar_hotel"),
     (r"\b(transporte|levar).*(cao|cachorro|cachorru|pet)\b", "pedir_transporte"),

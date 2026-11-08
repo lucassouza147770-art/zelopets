@@ -10,6 +10,11 @@ import { ZelinhoService } from './zelinho.service';
 export class ZelinhoController {
   constructor(private readonly zelinhoService: ZelinhoService) {}
 
+  @Get('inicio')
+  inicio(@Req() req: { user: { tutorId: string } }) {
+    return this.zelinhoService.inicio(req.user.tutorId);
+  }
+
   @Post('mensagens')
   responder(
     @Req() req: { user: { tutorId: string } },

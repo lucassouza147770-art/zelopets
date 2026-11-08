@@ -1,13 +1,14 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class RegisterDto {
-  @IsString()
+  @IsString({ message: 'Nome é obrigatório' })
+  @MinLength(1, { message: 'Nome é obrigatório' })
   nome: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'Informe um e-mail válido' })
   email: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsString({ message: 'Senha é obrigatória' })
+  @MinLength(6, { message: 'Senha deve ter pelo menos 6 caracteres' })
   senha: string;
 }

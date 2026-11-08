@@ -438,7 +438,7 @@ function TelaServico({ servico, onVoltar }: { servico: ServicoId; onVoltar: () =
   )
 }
 
-function TelaZelinho({ token, onSessaoExpirada, onVoltar }: { token: string; onSessaoExpirada: () => void; onVoltar: () => void }) {
+function TelaZelinho({ token, onSessaoExpirada, onVoltar, onAbrirAgenda }: { token: string; onSessaoExpirada: () => void; onVoltar: () => void; onAbrirAgenda: () => void }) {
   const [pergunta, setPergunta] = useState('')
   const [mensagens, setMensagens] = useState<Array<{ id: string; autor: 'zelinho' | 'tutor'; texto: string; horario: string }>>([
     { id: 'boas-vindas', autor: 'zelinho', texto: 'Olá! Sou o Zelinho. Posso orientar sobre os serviços do ZeloPets.', horario: 'agora' },
@@ -454,7 +454,21 @@ function TelaZelinho({ token, onSessaoExpirada, onVoltar }: { token: string; onS
     protocolo?: string
   }
 
-  async function enviarTexto(texto: string, opcoes: { intencao_forcada?: string; resposta_confirmacao?: 'sim' | 'nao' } = {}) {
+  useEffect(() => {
+    let ativa = true
+    api.get<RespostaZelinho>('/zelinho/inicio', token).then((resultado) => {
+      if (!ativa) return
+      setMensagens((anteriores) => anteriores.length === 1
+        ? [...anteriores, { id: 'boas-vindas-personalizada', autor: 'zelinho', texto: resultado.resposta ?? '', horario: 'agora' }]
+        : anteriores)
+      setSugestoes(resultado.sugestoes ?? [])
+    }).catch((erroRecebido: unknown) => {
+      if (erroRecebido instanceof ApiError && erroRecebido.status === 401) onSessaoExpirada()
+    })
+    return () => { ativa = false }
+  }, [onSessaoExpirada, token])
+
+  async function enviarTexto(texto: string, opcoes: { intencao_forcada?: string; resposta_confirmacao?: 'sim' | 'nao'; pet_id?: string } = {}) {
     if (!texto || estado === 'enviando') return
     setEstado('enviando')
     setErro(null)
@@ -508,9 +522,23 @@ function TelaZelinho({ token, onSessaoExpirada, onVoltar }: { token: string; onS
                 <button
                   type="button"
                   key={sugestao.valor}
-                  onClick={() => void (sugestao.valor === 'sim' || sugestao.valor === 'nao'
+                  onClick={() => {
+                    if (sugestao.valor === 'abrir_agenda') {
+                      onAbrirAgenda()
+                      return
+                    }
+                    if (sugestao.valor === 'cancelar_agendamento') {
+                      void enviarTexto('não')
+                      return
+                    }
+                    if (sugestao.valor.startsWith('pet:')) {
+                      void enviarTexto(sugestao.rotulo, { pet_id: sugestao.valor.slice(4) })
+                      return
+                    }
+                    void (sugestao.valor === 'sim' || sugestao.valor === 'nao'
                     ? enviarTexto(sugestao.valor, { resposta_confirmacao: sugestao.valor })
-                    : enviarTexto(sugestao.rotulo, { intencao_forcada: sugestao.valor }))}
+                    : enviarTexto(sugestao.rotulo, { intencao_forcada: sugestao.valor }))
+                  }}
                 >
                   {sugestao.rotulo}
                 </button>
@@ -673,7 +701,7 @@ export function App() {
       ) : rota === 'gemeo' ? (
         <TelaGemeoDigital token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('perfil')} onAbrirServico={selecionarServico} />
       ) : rota === 'zelinho' ? (
-        <TelaZelinho token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} />
+        <TelaZelinho token={token} onSessaoExpirada={encerrarSessao} onVoltar={() => navegar('inicio')} onAbrirAgenda={() => navegar('agenda')} />
       ) : rota === 'servico' && servicoAtivo === 'mobilidade' ? (
         <TelaMobilidade
           token={token}
