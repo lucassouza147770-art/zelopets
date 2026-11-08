@@ -7,10 +7,11 @@
   "license": "UNLICENSED",
   "scripts": {
     "preparar-env": "node scripts/preparar-env.mjs",
-    "verificar": "pnpm preparar-env && pnpm exec nest build && pnpm --dir frontend build && pnpm --dir ml-service exec pytest tests -q",
+    "verificar": "pnpm preparar-env && pnpm exec nest build && pnpm --dir frontend build && python -m pytest ml-service/tests -q",
     "dev:all": "pnpm preparar-env",
     "demo:zelinho": "node scripts/demo-zelinho.mjs",
     "zelinho:smoke": "node scripts/zelinho-smoke.mjs",
+    "aula:preparar": "node scripts/aula-preparar.mjs",
     "build": "nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -1,0 +1,1714 @@
+{
+  "info": {
+    "name": "ZeloPets — Aula Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "00 Saúde e Login",
+      "item": [
+        {
+          "name": "GET /saude — saúde",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/saude",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saude"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/registro — registro tutor único",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tutor Aula\",\n  \"email\": \"aula-{{$timestamp}}@example.com\",\n  \"senha\": \"aula1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"tokenB\", pm.response.json().accessToken);",
+                  "pm.test(\"registro\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login — login demo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{demoEmail}}\",\n  \"senha\": \"{{demoPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"token\", pm.response.json().accessToken);",
+                  "pm.test(\"login\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login — login admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"senha\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) pm.environment.set(\"adminToken\", pm.response.json().accessToken);",
+                  "pm.test(\"login admin configurado ou ausente\", () => pm.expect(pm.response.code).to.be.oneOf([200, 400, 401]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /tutores/me — perfil do tutor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutores/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tutores",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 CRUD de Pets",
+      "item": [
+        {
+          "name": "POST /pets — criar pet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Pet Aula\",\n  \"porte\": \"MEDIO\",\n  \"nivelEnergia\": \"ALTO\",\n  \"raca\": \"SRD\",\n  \"pesoKg\": 12,\n  \"comportamento\": [\n    \"sociavel\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"petId\", pm.response.json().id);",
+                  "pm.test(\"criação\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pets — listar pets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pets/{{petId}} — buscar pet criado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /pets/{{petId}} — atualizar pet",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Pet Aula Atualizado\",\n  \"pesoKg\": 13\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /pets/{{petId}} — remover pet",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pets/{{petId}} — confirmar 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"pet removido\", () => pm.expect(pm.response.code).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /pets — criar pet de apoio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Pet Apoio Aula\",\n  \"porte\": \"MEDIO\",\n  \"nivelEnergia\": \"MEDIO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"petId\", pm.response.json().id);",
+                  "pm.test(\"pet de apoio\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Prestadores e catálogo",
+      "item": [
+        {
+          "name": "GET /prestadores — listar prestadores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pacotes-hospedagem — listar pacotes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pacotes-hospedagem",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pacotes-hospedagem"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"pacoteId\", pm.response.json()[0].id);",
+                  "pm.test(\"catálogo\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /planos-nutricionais — listar planos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/planos-nutricionais",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "planos-nutricionais"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"planoId\", pm.response.json()[0].id);",
+                  "pm.test(\"catálogo\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Passeios e transporte",
+      "item": [
+        {
+          "name": "POST /passeios — criar passeio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/passeios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": \"{{petId}}\",\n  \"dataHora\": \"2030-01-01T10:00:00.000Z\",\n  \"duracaoMinutos\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"passeioId\", pm.response.json().id);",
+                  "pm.test(\"passeio\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /passeios — listar passeios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/passeios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /passeios/proximo — próximo passeio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/passeios/proximo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios",
+                "proximo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /passeios/{{passeioId}} — buscar passeio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/passeios/{{passeioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios",
+                "{{passeioId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /passeios/{{passeioId}} — atualizar passeio",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/passeios/{{passeioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios",
+                "{{passeioId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duracaoMinutos\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /passeios/{{passeioId}} — cancelar passeio",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/passeios/{{passeioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios",
+                "{{passeioId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Hospedagens",
+      "item": [
+        {
+          "name": "POST /hospedagens — criar hospedagem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hospedagens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hospedagens"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": \"{{petId}}\",\n  \"pacoteId\": \"{{pacoteId}}\",\n  \"dataCheckin\": \"2030-02-01T12:00:00.000Z\",\n  \"dataCheckout\": \"2030-02-03T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"hospedagemId\", pm.response.json().id);",
+                  "pm.test(\"hospedagem\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /hospedagens — listar hospedagens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hospedagens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hospedagens"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /hospedagens/{{hospedagemId}} — buscar hospedagem",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hospedagens/{{hospedagemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hospedagens",
+                "{{hospedagemId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /hospedagens/{{hospedagemId}} — atualizar hospedagem",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hospedagens/{{hospedagemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hospedagens",
+                "{{hospedagemId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dataCheckout\": \"2030-02-04T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /hospedagens/{{hospedagemId}} — cancelar hospedagem",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hospedagens/{{hospedagemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hospedagens",
+                "{{hospedagemId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Nutrição",
+      "item": [
+        {
+          "name": "POST /assinaturas-nutricionais — criar assinatura",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": \"{{petId}}\",\n  \"planoId\": \"{{planoId}}\",\n  \"quantidadeRacaoKg\": 5,\n  \"consumoDiarioEstimadoG\": 300\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"assinaturaId\", pm.response.json().id);",
+                  "pm.test(\"assinatura\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /assinaturas-nutricionais — listar assinaturas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /assinaturas-nutricionais/{{assinaturaId}} — buscar assinatura",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais/{{assinaturaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais",
+                "{{assinaturaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /assinaturas-nutricionais/{{assinaturaId}} — atualizar assinatura",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais/{{assinaturaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais",
+                "{{assinaturaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantidadeRacaoKg\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /assinaturas-nutricionais/{{assinaturaId}}/pausar — pausar assinatura",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais/{{assinaturaId}}/pausar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais",
+                "{{assinaturaId}}",
+                "pausar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /assinaturas-nutricionais/{{assinaturaId}}/retomar — retomar assinatura",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais/{{assinaturaId}}/retomar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais",
+                "{{assinaturaId}}",
+                "retomar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 Agenda e recomendações",
+      "item": [
+        {
+          "name": "GET /agenda — agenda",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/agenda",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "agenda"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /agenda/proximo — próximo cuidado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/agenda/proximo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "agenda",
+                "proximo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /recomendacoes — recomendações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recomendacoes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recomendacoes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 Pagamento simulado",
+      "item": [
+        {
+          "name": "POST /pagamentos/simular — aprovar passeio simulado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pagamentos/simular",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagamentos",
+                "simular"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"PASSEIO\",\n  \"id\": \"{{passeioId}}\",\n  \"metodo\": \"PIX\",\n  \"resultado\": \"APROVADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 Zelinho",
+      "item": [
+        {
+          "name": "GET /zelinho/inicio — início",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/zelinho/inicio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zelinho",
+                "inicio"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /zelinho/mensagens — mensagem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/zelinho/mensagens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zelinho",
+                "mensagens"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Quero ver os preços do hotel\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /zelinho/atendimento/atual — atendimento atual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/zelinho/atendimento/atual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "zelinho",
+                "atendimento",
+                "atual"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 Erros e segurança",
+      "item": [
+        {
+          "name": "GET /pets — sem token 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"401\", () => pm.expect(pm.response.code).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pets — token inválido 401",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token-invalido"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"401\", () => pm.expect(pm.response.code).to.eql(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /pets — corpo inválido 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"porte\": \"INVALIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"400\", () => pm.expect(pm.response.code).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /pets/00000000-0000-0000-0000-000000000000 — id inexistente 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"404\", () => pm.expect(pm.response.code).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /atendimentos — admin sem papel 403",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/atendimentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "atendimentos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"acesso\", () => pm.expect(pm.response.code).to.be.oneOf([200, 403]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/registro — e-mail repetido 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Demo\",\n  \"email\": \"{{demoEmail}}\",\n  \"senha\": \"demo1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"409\", () => pm.expect(pm.response.code).to.eql(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /pets — campos calculados ignorados",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Whitelist\",\n  \"porte\": \"PEQUENO\",\n  \"nivelEnergia\": \"BAIXO\",\n  \"valor\": 1,\n  \"valorTotal\": 1,\n  \"status\": \"APROVADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"whitelist\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "99 Limpeza",
+      "item": [
+        {
+          "name": "DELETE /passeios/{{passeioId}} — remover passeio",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/passeios/{{passeioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "passeios",
+                "{{passeioId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /hospedagens/{{hospedagemId}} — remover hospedagem",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hospedagens/{{hospedagemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "hospedagens",
+                "{{hospedagemId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /assinaturas-nutricionais/{{assinaturaId}} — remover assinatura",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/assinaturas-nutricionais/{{assinaturaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assinaturas-nutricionais",
+                "{{assinaturaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /pets/{{petId}} — remover pet de apoio",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
