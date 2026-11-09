@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ConflictException, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePetDto } from './dto/create-pet.dto';
@@ -9,8 +9,15 @@ describe('PetsService', () => {
   const prisma = {
     pet: {
       create: jest.fn(),
+      delete: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
     },
+    passeio: { count: jest.fn() },
+    hospedagem: { count: jest.fn() },
+    assinaturaNutricional: { count: jest.fn() },
+    perfilPetCluster: { deleteMany: jest.fn() },
+    $transaction: jest.fn((callback: (tx: typeof prisma) => unknown) => callback(prisma)),
   };
 
   beforeEach(async () => {
@@ -79,6 +86,32 @@ describe('PetsService', () => {
     })).toThrow('A data de nascimento não pode ser futura.');
 
     expect(prisma.pet.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects pet deletion while it has reservations', async () => {
+    prisma.pet.findFirst.mockResolvedValue({ id: 'pet-1' });
+    prisma.passeio.count.mockResolvedValue(1);
+    prisma.hospedagem.count.mockResolvedValue(0);
+    prisma.assinaturaNutricional.count.mockResolvedValue(0);
+
+    await expect(service.remove('tutor-1', 'pet-1')).rejects.toThrow(
+      new ConflictException('Este pet tem reservas; cancele antes'),
+    );
+    expect(prisma.pet.delete).not.toHaveBeenCalled();
+  });
+
+  it('deletes a pet without reservations and its cluster profile', async () => {
+    prisma.pet.findFirst.mockResolvedValue({ id: 'pet-1' });
+    prisma.passeio.count.mockResolvedValue(0);
+    prisma.hospedagem.count.mockResolvedValue(0);
+    prisma.assinaturaNutricional.count.mockResolvedValue(0);
+    prisma.perfilPetCluster.deleteMany.mockResolvedValue({ count: 1 });
+    prisma.pet.delete.mockResolvedValue({ id: 'pet-1' });
+
+    await service.remove('tutor-1', 'pet-1');
+
+    expect(prisma.perfilPetCluster.deleteMany).toHaveBeenCalledWith({ where: { petId: 'pet-1' } });
+    expect(prisma.pet.delete).toHaveBeenCalled();
   });
 
   it('validates the profile data received by the API', async () => {

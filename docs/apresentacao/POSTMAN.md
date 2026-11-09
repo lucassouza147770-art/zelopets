@@ -1,7 +1,8 @@
 # Guia rápido do Postman
 
 1. Copie `.env.example` para `.env`, configure `DATABASE_URL`, `JWT_SECRET` e,
-   para o admin, `ADMIN_DEMO_PASSWORD`.
+   para o admin local, `ADMIN_DEMO_PASSWORD=admin1234` (senha apenas de
+   demonstração; não use em produção).
 2. Suba PostgreSQL, o Nest (`pnpm start:dev`) e, se quiser recomendações/chat
    completos, o FastAPI na porta 8000.
 3. Execute `pnpm prisma migrate deploy` e `pnpm prisma db seed`.

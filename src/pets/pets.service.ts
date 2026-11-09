@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Especie } from '@prisma/client';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Especie, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
@@ -103,12 +103,26 @@ export class PetsService {
 
   async remove(tutorId: string, id: string) {
     await this.findOne(tutorId, id);
-    return this.prisma.$transaction(async (prisma) => {
-      await prisma.perfilPetCluster.deleteMany({ where: { petId: id } });
-      await prisma.assinaturaNutricional.deleteMany({ where: { petId: id } });
-      await prisma.hospedagem.deleteMany({ where: { petId: id } });
-      await prisma.passeio.deleteMany({ where: { petId: id } });
-      return prisma.pet.delete({ where: { id }, select: this.selectPet });
-    });
+    const mensagem = 'Este pet tem reservas; cancele antes';
+    try {
+      return await this.prisma.$transaction(async (prisma) => {
+        const [passeios, hospedagens, assinaturas] = await Promise.all([
+          prisma.passeio.count({ where: { petId: id } }),
+          prisma.hospedagem.count({ where: { petId: id } }),
+          prisma.assinaturaNutricional.count({ where: { petId: id } }),
+        ]);
+        if (passeios + hospedagens + assinaturas > 0) {
+          throw new ConflictException(mensagem);
+        }
+
+        await prisma.perfilPetCluster.deleteMany({ where: { petId: id } });
+        return prisma.pet.delete({ where: { id }, select: this.selectPet });
+      });
+    } catch (erro: unknown) {
+      if (erro instanceof Prisma.PrismaClientKnownRequestError && erro.code === 'P2003') {
+        throw new ConflictException(mensagem);
+      }
+      throw erro;
+    }
   }
 }

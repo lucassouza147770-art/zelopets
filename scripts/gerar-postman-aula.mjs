@@ -1,11 +1,12 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 
-const request = (name, method, path, { body, auth = true, headers = [], test = 'pm.test("status esperado", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));' } = {}) => ({
+const request = (name, method, path, { body, auth = true, authToken, headers = [], test = 'pm.test("status esperado", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));' } = {}) => ({
   name: `${method} ${path} — ${name}`,
   request: {
     method,
     header: [...(body ? [{ key: 'Content-Type', value: 'application/json' }] : []), ...headers],
     ...(auth ? {} : { auth: { type: 'noauth' } }),
+    ...(authToken ? { auth: { type: 'bearer', bearer: [{ key: 'token', value: `{{${authToken}}}`, type: 'string' }] } } : {}),
     url: { raw: `{{baseUrl}}${path}`, host: ['{{baseUrl}}'], path: path.slice(1).split('/') },
     ...(body ? { body: { mode: 'raw', raw: JSON.stringify(body, null, 2), options: { raw: { language: 'json' } } } } : {}),
   },
@@ -64,6 +65,16 @@ const folders = [
       request('listar prestadores', 'GET', '/prestadores'),
       request('listar pacotes', 'GET', '/pacotes-hospedagem', { auth: false, test: `${capture('pacoteId', 'pm.response.json()[0].id')}\npm.test("catálogo", () => pm.expect(pm.response.code).to.eql(200));` }),
       request('listar planos', 'GET', '/planos-nutricionais', { auth: false, test: `${capture('planoId', 'pm.response.json()[0].id')}\npm.test("catálogo", () => pm.expect(pm.response.code).to.eql(200));` }),
+      request('criar prestador ADMIN', 'POST', '/prestadores', {
+        authToken: 'adminToken',
+        body: { nome: 'Prestador Aula', tipo: 'PASSEADOR', experienciaAnos: 2, portesAtendidos: ['MEDIO'] },
+        test: `${capture('prestadorId', 'pm.response.json().id')}\npm.test("criação ADMIN", () => pm.expect(pm.response.code).to.eql(201));`,
+      }),
+      request('atualizar prestador ADMIN', 'PATCH', '/prestadores/{{prestadorId}}', {
+        authToken: 'adminToken',
+        body: { bio: 'Atualizado para a aula' },
+      }),
+      request('inativar prestador ADMIN', 'DELETE', '/prestadores/{{prestadorId}}', { authToken: 'adminToken' }),
     ],
   },
   {
@@ -117,9 +128,23 @@ const folders = [
       request('token inválido 401', 'GET', '/pets', { test: 'pm.test("401", () => pm.expect(pm.response.code).to.eql(401));', auth: false, headers: [{ key: 'Authorization', value: 'Bearer token-invalido' }] }),
       request('corpo inválido 400', 'POST', '/pets', { body: { nome: '', porte: 'INVALIDO' }, test: 'pm.test("400", () => pm.expect(pm.response.code).to.eql(400));' }),
       request('id inexistente 404', 'GET', '/pets/00000000-0000-0000-0000-000000000000', { test: 'pm.test("404", () => pm.expect(pm.response.code).to.eql(404));' }),
-      request('admin sem papel 403', 'GET', '/atendimentos', { test: 'pm.test("acesso", () => pm.expect(pm.response.code).to.be.oneOf([200, 403]));' }),
+      request('tutor não administra atendimentos 403', 'GET', '/atendimentos', { test: 'pm.test("403", () => pm.expect(pm.response.code).to.eql(403));' }),
+      request('tutor não cria prestador 403', 'POST', '/prestadores', {
+        body: { nome: 'Negado para tutor', tipo: 'PASSEADOR' },
+        test: 'pm.test("403", () => pm.expect(pm.response.code).to.eql(403));',
+      }),
+      request('tutor não atualiza prestador 403', 'PATCH', '/prestadores/{{prestadorId}}', {
+        body: { bio: 'Negado para tutor' },
+        test: 'pm.test("403", () => pm.expect(pm.response.code).to.eql(403));',
+      }),
+      request('tutor não inativa prestador 403', 'DELETE', '/prestadores/{{prestadorId}}', {
+        test: 'pm.test("403", () => pm.expect(pm.response.code).to.eql(403));',
+      }),
       request('e-mail repetido 409', 'POST', '/auth/registro', { auth: false, body: { nome: 'Demo', email: '{{demoEmail}}', senha: 'demo1234' }, test: 'pm.test("409", () => pm.expect(pm.response.code).to.eql(409));' }),
       request('campos calculados ignorados', 'POST', '/pets', { body: { nome: 'Whitelist', porte: 'PEQUENO', nivelEnergia: 'BAIXO', valor: 1, valorTotal: 1, status: 'APROVADO' }, test: 'pm.test("whitelist", () => pm.expect(pm.response.code).to.eql(201));' }),
+      request('não apaga pet com reservas 409', 'DELETE', '/pets/{{petId}}', {
+        test: 'pm.test("409", () => pm.expect(pm.response.code).to.eql(409));\npm.test("mensagem amigável", () => pm.expect(pm.response.json().message).to.eql("Este pet tem reservas; cancele antes"));',
+      }),
     ],
   },
   {
@@ -128,7 +153,9 @@ const folders = [
       request('remover passeio', 'DELETE', '/passeios/{{passeioId}}'),
       request('remover hospedagem', 'DELETE', '/hospedagens/{{hospedagemId}}'),
       request('remover assinatura', 'DELETE', '/assinaturas-nutricionais/{{assinaturaId}}'),
-      request('remover pet de apoio', 'DELETE', '/pets/{{petId}}'),
+      request('pet com histórico permanece bloqueado 409', 'DELETE', '/pets/{{petId}}', {
+        test: 'pm.test("409", () => pm.expect(pm.response.code).to.eql(409));\npm.test("mensagem", () => pm.expect(pm.response.json().message).to.eql("Este pet tem reservas; cancele antes"));',
+      }),
     ],
   },
 ];

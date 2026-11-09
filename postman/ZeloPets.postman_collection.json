@@ -533,6 +533,145 @@
               }
             }
           ]
+        },
+        {
+          "name": "POST /prestadores — criar prestador ADMIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prestadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Prestador Aula\",\n  \"tipo\": \"PASSEADOR\",\n  \"experienciaAnos\": 2,\n  \"portesAtendidos\": [\n    \"MEDIO\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.set(\"prestadorId\", pm.response.json().id);",
+                  "pm.test(\"criação ADMIN\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /prestadores/{{prestadorId}} — atualizar prestador ADMIN",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prestadores/{{prestadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores",
+                "{{prestadorId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Atualizado para a aula\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /prestadores/{{prestadorId}} — inativar prestador ADMIN",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prestadores/{{prestadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores",
+                "{{prestadorId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -1486,7 +1625,7 @@
           ]
         },
         {
-          "name": "GET /atendimentos — admin sem papel 403",
+          "name": "GET /atendimentos — tutor não administra atendimentos 403",
           "request": {
             "method": "GET",
             "header": [],
@@ -1505,7 +1644,115 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"acesso\", () => pm.expect(pm.response.code).to.be.oneOf([200, 403]));"
+                  "pm.test(\"403\", () => pm.expect(pm.response.code).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /prestadores — tutor não cria prestador 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestadores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Negado para tutor\",\n  \"tipo\": \"PASSEADOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"403\", () => pm.expect(pm.response.code).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /prestadores/{{prestadorId}} — tutor não atualiza prestador 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prestadores/{{prestadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores",
+                "{{prestadorId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Negado para tutor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"403\", () => pm.expect(pm.response.code).to.eql(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /prestadores/{{prestadorId}} — tutor não inativa prestador 403",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prestadores/{{prestadorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prestadores",
+                "{{prestadorId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"403\", () => pm.expect(pm.response.code).to.eql(403));"
                 ]
               }
             }
@@ -1590,6 +1837,34 @@
               "script": {
                 "exec": [
                   "pm.test(\"whitelist\", () => pm.expect(pm.response.code).to.eql(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /pets/{{petId}} — não apaga pet com reservas 409",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"409\", () => pm.expect(pm.response.code).to.eql(409));",
+                  "pm.test(\"mensagem amigável\", () => pm.expect(pm.response.json().message).to.eql(\"Este pet tem reservas; cancele antes\"));"
                 ]
               }
             }
@@ -1682,7 +1957,7 @@
           ]
         },
         {
-          "name": "DELETE /pets/{{petId}} — remover pet de apoio",
+          "name": "DELETE /pets/{{petId}} — pet com histórico permanece bloqueado 409",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -1702,7 +1977,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"status esperado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                  "pm.test(\"409\", () => pm.expect(pm.response.code).to.eql(409));",
+                  "pm.test(\"mensagem\", () => pm.expect(pm.response.json().message).to.eql(\"Este pet tem reservas; cancele antes\"));"
                 ]
               }
             }

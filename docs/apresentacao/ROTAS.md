@@ -21,7 +21,7 @@ removidos pela `ValidationPipe({ whitelist: true })`.
 | GET | `/pets` | JWT | — | 200 lista | 401 |
 | GET | `/pets/:id` | JWT | — | 200 pet | 401, 404 |
 | PATCH | `/pets/:id` | JWT | parcial | 200 pet | 400, 401, 404 |
-| DELETE | `/pets/:id` | JWT | — | 200 pet removido | 401, 404 |
+| DELETE | `/pets/:id` | JWT | — | 200 pet removido | 401, 404, 409 |
 
 Exemplo POST: `{"nome":"Luna","porte":"MEDIO","nivelEnergia":"ALTO","raca":"SRD","pesoKg":12}`.
 Exemplo PATCH: `{"nome":"Luna Atualizada","pesoKg":13}`.
@@ -32,9 +32,9 @@ Exemplo PATCH: `{"nome":"Luna Atualizada","pesoKg":13}`.
 |---|---|---|---|---|---|
 | GET | `/prestadores` | público | — (`tipo` opcional) | 200 lista ativa | 400 |
 | GET | `/prestadores/:id` | público | — | 200 prestador | 404 |
-| POST | `/prestadores` | JWT | `nome,tipo` | 201 prestador | 400, 401 |
-| PATCH | `/prestadores/:id` | JWT | parcial | 200 prestador | 400, 401, 404 |
-| DELETE | `/prestadores/:id` | JWT | — | 200 inativa | 401, 404 |
+| POST | `/prestadores` | ADMIN | `nome,tipo` | 201 prestador | 400, 401, 403 |
+| PATCH | `/prestadores/:id` | ADMIN | parcial | 200 prestador | 400, 401, 403, 404 |
+| DELETE | `/prestadores/:id` | ADMIN | — | 200 inativa | 401, 403, 404 |
 | GET | `/pacotes-hospedagem` | público | — | 200 catálogo | — |
 | GET | `/planos-nutricionais` | público | — | 200 catálogo | — |
 
@@ -128,5 +128,8 @@ PATCH: `{"status":"RESOLVIDO","respostaEquipe":"Atendimento concluído"}`.
 - `valor`, `valorTotal` e `status` não estão nos DTOs de criação/atualização:
   com `whitelist`, esses campos são removidos do corpo. Preços, status inicial e
   transições são decididos no service.
+- As alterações de prestadores exigem JWT de ADMIN. Excluir pet com passeio,
+  hospedagem ou assinatura vinculados retorna 409 com
+  `Este pet tem reservas; cancele antes`; registros relacionados não são apagados.
 - O código não registra `ThrottlerModule`; o limite de 20 mensagens/minuto do
   Zelinho é uma regra própria do service, não um throttler global.

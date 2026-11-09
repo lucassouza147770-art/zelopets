@@ -73,7 +73,7 @@ respectivamente, `findMany`, `findFirst`, `create`, `update` e `delete`
 Objetivo: listar catálogo ativo e permitir manutenção autenticada.
 `GET /prestadores` e `GET /prestadores/:id` são públicos
 ([prestador.controller.ts](../../src/prestador/prestador.controller.ts):23-31);
-POST/PATCH/DELETE exigem JWT (linhas 33-50). O service usa `findMany`,
+POST/PATCH/DELETE exigem `JwtAuthGuard` e `AdminGuard` (linhas 33-50). O service usa `findMany`,
 `findFirst`, `create`, `update` e inativação lógica
 ([prestador.service.ts](../../src/prestador/prestador.service.ts):12-39).
 
@@ -156,8 +156,10 @@ Objetivo: mostrar estado do banco e do FastAPI. `GET /saude`
   recalcula validações e chama `pet.update` ([pets.service.ts](../../src/pets/pets.service.ts):82-103).
   Sucesso 200; 400/401/404 conforme validação, autenticação ou id.
 - **D** `DELETE /pets/:id`: confirma propriedade com `findOne` e chama
-  `pet.delete` ([pets.service.ts](../../src/pets/pets.service.ts):105-107).
-  Sucesso 200 com o pet removido; 401/404 em erro.
+  `pet.delete` somente sem passeios, hospedagens ou assinaturas vinculadas
+  ([pets.service.ts](../../src/pets/pets.service.ts):105-126). Com reservas,
+  responde 409 `Este pet tem reservas; cancele antes`; sem vínculos, sucesso
+  200 com o pet removido.
 
 ## 5. Validação com DTO
 
